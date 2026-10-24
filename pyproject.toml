@@ -1,0 +1,20 @@
+[build-system]
+requires = ["setuptools>=68", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "websmith-cli"
+version = "0.1.0a1"
+description = "Deterministic tooling for independent Markdown-first websites"
+readme = "README.md"
+requires-python = ">=3.11"
+dependencies = ["PyYAML==6.0.3", "beautifulsoup4==4.14.3", "jsonschema==4.26.0"]
+
+[project.scripts]
+websmith = "websmith.engine:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[tool.setuptools.package-data]
+websmith = ["resources/schemas/*.json", "resources/docs/*.md"]

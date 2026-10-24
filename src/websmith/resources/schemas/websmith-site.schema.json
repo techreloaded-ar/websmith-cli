@@ -1,0 +1,266 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://websmith.local/schemas/websmith-site.schema.json",
+  "title": "Websmith site manifest",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "version",
+    "site",
+    "paths",
+    "content",
+    "frontmatter",
+    "templates",
+    "styles",
+    "assets",
+    "brand",
+    "root_redirect"
+  ],
+  "properties": {
+    "$schema": { "type": "string", "minLength": 1 },
+    "version": { "const": 1 },
+    "site": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["id", "name", "status", "base_url"],
+      "properties": {
+        "id": { "type": "string", "pattern": "^[a-z0-9][a-z0-9-]*$" },
+        "name": { "type": "string", "minLength": 1 },
+        "status": { "enum": ["active", "migrating", "legacy", "inactive"] },
+        "base_url": { "type": "string", "format": "uri", "pattern": "^https?://" }
+      }
+    },
+    "paths": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "composition_guide",
+        "contents",
+        "templates",
+        "components",
+        "component_catalog",
+        "css",
+        "media",
+        "output"
+      ],
+      "properties": {
+        "composition_guide": { "$ref": "#/$defs/relativePath" },
+        "contents": { "$ref": "#/$defs/relativePath" },
+        "templates": { "$ref": "#/$defs/relativePath" },
+        "components": { "$ref": "#/$defs/relativePath" },
+        "component_catalog": { "$ref": "#/$defs/relativePath" },
+        "css": { "$ref": "#/$defs/relativePath" },
+        "media": { "$ref": "#/$defs/relativePath" },
+        "output": { "$ref": "#/$defs/relativePath" }
+      }
+    },
+    "content": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["canonical_language", "languages", "page_directories"],
+      "properties": {
+        "canonical_language": { "$ref": "#/$defs/languageId" },
+        "languages": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "$ref": "#/$defs/language" },
+          "propertyNames": { "$ref": "#/$defs/languageId" }
+        },
+        "page_directories": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "pattern": "^[^/]+$" }
+        }
+      }
+    },
+    "frontmatter": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["required", "canonical_page_required"],
+      "properties": {
+        "required": { "$ref": "#/$defs/nonEmptyStringList" },
+        "canonical_page_required": { "$ref": "#/$defs/nonEmptyStringList" }
+      }
+    },
+    "routing": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "strip_source_prefixes": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1, "pattern": "^[^/]+$" }
+        },
+        "output_overrides": {
+          "type": "object",
+          "propertyNames": { "type": "string", "minLength": 1 },
+          "additionalProperties": { "$ref": "#/$defs/relativePath" }
+        }
+      }
+    },
+    "templates": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["default", "profiles"],
+      "properties": {
+        "default": { "$ref": "#/$defs/relativePath" },
+        "profiles": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "$ref": "#/$defs/templateProfile" }
+        }
+      }
+    },
+    "styles": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["publish"],
+      "properties": {
+        "publish": {
+          "type": "object",
+          "minProperties": 1,
+          "propertyNames": { "$ref": "#/$defs/relativePath" },
+          "additionalProperties": { "$ref": "#/$defs/relativePath" }
+        }
+      }
+    },
+    "assets": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["shared_images", "editorial_sources", "resolution_roots"],
+      "properties": {
+        "shared_images": { "$ref": "#/$defs/copyRule" },
+        "editorial_sources": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/relativePath" }
+        },
+        "resolution_roots": {
+          "type": "array",
+          "minItems": 1,
+          "uniqueItems": true,
+          "items": { "$ref": "#/$defs/relativePath" }
+        },
+        "copy_rules": {
+          "type": "array",
+          "items": { "$ref": "#/$defs/copyRule" }
+        }
+      }
+    },
+    "brand": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["organization", "email", "logo", "published_logo"],
+      "properties": {
+        "organization": { "type": "string", "minLength": 1 },
+        "email": { "type": "string", "format": "email" },
+        "logo": { "$ref": "#/$defs/relativePath" },
+        "published_logo": { "$ref": "#/$defs/relativePath" }
+      }
+    },
+    "root_redirect": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": [
+        "enabled",
+        "template",
+        "output",
+        "default_language",
+        "destinations",
+        "alternates",
+        "title",
+        "description",
+        "language_labels"
+      ],
+      "properties": {
+        "enabled": { "type": "boolean" },
+        "template": { "$ref": "#/$defs/relativePath" },
+        "output": { "$ref": "#/$defs/relativePath" },
+        "default_language": { "$ref": "#/$defs/languageId" },
+        "destinations": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "$ref": "#/$defs/relativePath" },
+          "propertyNames": { "$ref": "#/$defs/languageId" }
+        },
+        "alternates": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "type": "string", "minLength": 2 },
+          "propertyNames": { "$ref": "#/$defs/languageId" }
+        },
+        "title": { "type": "string", "minLength": 1 },
+        "description": { "type": "string", "minLength": 1 },
+        "language_labels": {
+          "type": "object",
+          "minProperties": 1,
+          "additionalProperties": { "type": "string", "minLength": 1 },
+          "propertyNames": { "$ref": "#/$defs/languageId" }
+        }
+      }
+    },
+    "compatibility": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "legacy_commands": {
+          "type": "array",
+          "uniqueItems": true,
+          "items": { "type": "string", "minLength": 1 }
+        }
+      }
+    }
+  },
+  "$defs": {
+    "relativePath": {
+      "type": "string",
+      "minLength": 1,
+      "not": { "pattern": "^(?:/|[A-Za-z]:[\\\\/])" }
+    },
+    "languageId": {
+      "type": "string",
+      "pattern": "^[a-z][a-z0-9-]*$"
+    },
+    "language": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["html_lang", "source", "output"],
+      "properties": {
+        "html_lang": { "type": "string", "pattern": "^[A-Za-z]{2,3}(?:-[A-Za-z0-9]+)*$" },
+        "source": { "$ref": "#/$defs/relativePath" },
+        "output": { "$ref": "#/$defs/relativePath" },
+        "labels": {
+          "type": "object",
+          "propertyNames": { "type": "string", "minLength": 1 },
+          "additionalProperties": { "type": "string" }
+        }
+      }
+    },
+    "nonEmptyStringList": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": { "type": "string", "minLength": 1 }
+    },
+    "templateProfile": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["file", "content_target"],
+      "properties": {
+        "file": { "$ref": "#/$defs/relativePath" },
+        "content_target": { "type": "string", "minLength": 1 }
+      }
+    },
+    "copyRule": {
+      "type": "object",
+      "additionalProperties": false,
+      "required": ["source", "output"],
+      "properties": {
+        "source": { "$ref": "#/$defs/relativePath" },
+        "output": { "$ref": "#/$defs/relativePath" }
+      }
+    }
+  }
+}

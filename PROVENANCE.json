@@ -1,0 +1,31 @@
+{
+  "source_project": "/Users/giovanni/progetti/websmith",
+  "date": "2026-10-24",
+  "files": [
+    {
+      "source": "scripts/websmith.py",
+      "target": "src/websmith/engine.py",
+      "sha256": "2ef32b8be02d920094401efa8b59ba360c6643bcd1ebf21b9bb7b1f64c66dda3"
+    },
+    {
+      "source": "schemas/websmith-site.schema.json",
+      "target": "src/websmith/resources/schemas/websmith-site.schema.json",
+      "sha256": "6864a521accf971a75a27163b48262d3c416b458e875d0918d2e789ba462ab6a"
+    },
+    {
+      "source": "docs/HELP.md",
+      "target": "src/websmith/resources/docs/HELP.md",
+      "sha256": "41cdffcb317822b8b43938a3467b07295e6eac3c24e2951d43b1892211b55824"
+    },
+    {
+      "source": "docs/WEBSMITH_CONTRACT.md",
+      "target": "src/websmith/resources/docs/WEBSMITH_CONTRACT.md",
+      "sha256": "ad67af9b5ac17e82f390d2ac40953826e84fc130e4d46378c32d745805fd9fbb"
+    },
+    {
+      "source": "AGENTS.md",
+      "target": "src/websmith/resources/docs/ORIGINAL_AGENT_RULES.md",
+      "sha256": "62dc04cad733c2929238fcb87d0c53644d21e9037f24dad1953acb7ba978be2a"
+    }
+  ]
+}
