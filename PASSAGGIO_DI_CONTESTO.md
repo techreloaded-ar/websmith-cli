@@ -177,8 +177,8 @@ e verifiche. Le scelte tecniche proposte non sono nuove decisioni dell'utente.
 - prove sintetiche temporanee, senza creare ancora il nuovo TechReloaded;
 - installazione locale in `.venv`, cinque test superati e dipendenze coerenti;
 - pacchetto installabile in `dist/` e controlli GitHub in `.github/workflows/check.yml`;
-- repository GitHub privato `https://github.com/AgileReloaded/websmith-cli`,
-  creato su richiesta dell’utente nell’organizzazione AgileReloaded.
+- repository GitHub privato `https://github.com/techreloaded-ar/websmith-cli`,
+  trasferito nell’organizzazione techreloaded-ar scelta dall’utente.
 
 L'utente ha scelto di usare il nuovo TechReloaded come sito indipendente, in una
 posizione che indicherà. Non creare ora un sito reale né installare il motore

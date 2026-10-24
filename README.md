@@ -9,7 +9,7 @@ Il repository è privato: occorre un account GitHub autorizzato e Git configurat
 per accedervi. Per installare la prima versione:
 
 ```bash
-pipx install 'git+https://github.com/AgileReloaded/websmith-cli.git@v0.1.0a1'
+pipx install 'git+https://github.com/techreloaded-ar/websmith-cli.git@v0.1.0a1'
 ```
 
 Serve anche Git. `pipx` installa il programma in un ambiente Python separato;
