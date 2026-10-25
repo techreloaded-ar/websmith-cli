@@ -1,0 +1,41 @@
+name: Build npm native engines
+on:
+  workflow_dispatch:
+  push:
+    paths: ['src/**', 'npm/**', 'scripts/build-native.py', '.github/workflows/native.yml']
+permissions:
+  contents: read
+jobs:
+  native:
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - runner: macos-14
+            target: darwin-arm64
+          - runner: macos-15-intel
+            target: darwin-x64
+          - runner: ubuntu-22.04
+            target: linux-x64
+          - runner: windows-latest
+            target: win32-x64
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '22'
+      - run: python -m pip install -c requirements.lock . PyInstaller==6.16.0
+      - run: python scripts/build-native.py
+      - run: python -m unittest discover -s tests -v
+        env:
+          WEBSMITH_TEST_BINARY: ${{ github.workspace }}/npm/websmith-${{ matrix.target }}/bin/websmith${{ matrix.target == 'win32-x64' && '.exe' || '' }}
+      - run: npm test
+      - run: npm pack ./npm/websmith-${{ matrix.target }}
+      - uses: actions/upload-artifact@v4
+        with:
+          name: npm-${{ matrix.target }}
+          path: techreloaded-websmith-*.tgz

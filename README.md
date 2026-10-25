@@ -70,3 +70,40 @@ pacchetto: l'installazione non dipende dalla cartella del motore originale.
 `requirements.lock` registra tutte le versioni delle librerie verificate con
 Python 3.11. I controlli GitHub usano queste versioni anche sulle altre versioni
 Python dichiarate nella matrice; tali esecuzioni remote non sono ancora avvenute.
+
+## Distribuzione npm in preparazione
+
+L'obiettivo concordato è installare il programma con:
+
+```bash
+npm install -g @techreloaded/websmith
+websmith version
+```
+
+Questo comando sarà disponibile dopo la pubblicazione su npm. Lo scope
+`@techreloaded` è indipendente dal proprietario GitHub `techreloaded-ar`.
+L'accesso npm allo scope deve ancora essere verificato: questa macchina non
+risulta autenticata su npm. Nessun pacchetto è stato pubblicato.
+
+Il pacchetto principale in `npm/websmith` avvia il motore autonomo della
+piattaforma, installato come dipendenza facoltativa selezionata da npm.
+Non occorrono Python, pipx o Git sul computer dell'utilizzatore per lavorare
+localmente. Occorrono Node.js 20+ e npm; non usare `--omit=optional`.
+I target iniziali sono macOS ARM64/Intel, Windows x64 e Linux x64.
+
+Per costruire il motore sulla propria piattaforma (solo sviluppo):
+
+```bash
+.venv/bin/python -m pip install PyInstaller==6.16.0
+.venv/bin/python scripts/build-native.py
+npm test
+npm pack ./npm/websmith
+```
+
+La preparazione degli altri sistemi è definita in
+`.github/workflows/native.yml`. Ogni sistema costruisce il proprio eseguibile;
+non viene simulata una compilazione per Windows da macOS.
+Le versioni npm usano `0.1.0-alpha.1`, equivalente alla versione Python `0.1.0a1`.
+Prima di pubblicare occorre verificare tutti gli eseguibili e pubblicare i
+pacchetti di piattaforma prima del pacchetto principale. `websmith init` resta
+un lavoro separato ancora da implementare.

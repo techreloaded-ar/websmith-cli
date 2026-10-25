@@ -197,3 +197,14 @@ Leggere questo documento e la proposta copiata, esaminare i riferimenti original
 e preparare nel nuovo progetto il piano tecnico della prima fase. Distinguere
 le decisioni dell'utente dalle proposte ancora aperte. Non modificare il progetto
 originale e non attivare pubblicazioni remote.
+
+## Aggiornamento del 25 ottobre 2026: distribuzione npm
+
+L'utente ha scelto l'esperienza npm, sul modello di ARchetipo. Il nome proposto è
+`@techreloaded/websmith`; lo scope npm non è determinato dall'organizzazione GitHub.
+La distribuzione pipx resta disponibile ma non è il percorso semplificato scelto.
+Sono stati preparati il lanciatore Node, i pacchetti per piattaforma e la
+costruzione PyInstaller del motore Python autonomo. La macchina non è autenticata
+su npm: non è stata verificata l'autorizzazione allo scope né pubblicato alcunché.
+Vedere README per istruzioni e limiti. Non confondere preparazione locale,
+verifica su tutti i sistemi e pubblicazione effettiva del pacchetto.

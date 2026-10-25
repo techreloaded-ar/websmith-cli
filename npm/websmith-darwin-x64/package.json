@@ -1,0 +1,17 @@
+{
+  "name": "@techreloaded/websmith-darwin-x64",
+  "version": "0.1.0-alpha.1",
+  "os": [
+    "darwin"
+  ],
+  "cpu": [
+    "x64"
+  ],
+  "files": [
+    "bin/"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/techreloaded-ar/websmith-cli.git"
+  }
+}

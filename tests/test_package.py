@@ -1,4 +1,5 @@
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
@@ -39,7 +40,8 @@ def make_site(root):
 
 class PackageTests(unittest.TestCase):
     def run_cli(self, *args, cwd=None):
-        return subprocess.run([sys.executable, '-m', 'websmith', *map(str, args)], cwd=cwd, text=True, capture_output=True)
+        command = [os.environ['WEBSMITH_TEST_BINARY']] if os.environ.get('WEBSMITH_TEST_BINARY') else [sys.executable, '-m', 'websmith']
+        return subprocess.run([*command, *map(str, args)], cwd=cwd, text=True, capture_output=True)
 
     def assert_ok(self, result):
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)

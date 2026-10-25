@@ -1,0 +1,25 @@
+{
+  "name": "@techreloaded/websmith",
+  "version": "0.1.0-alpha.1",
+  "description": "Deterministic tooling for independent websites",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/techreloaded-ar/websmith-cli.git"
+  },
+  "engines": {
+    "node": ">=20"
+  },
+  "bin": {
+    "websmith": "bin/websmith.cjs"
+  },
+  "files": [
+    "bin/",
+    "README.md"
+  ],
+  "optionalDependencies": {
+    "@techreloaded/websmith-darwin-arm64": "0.1.0-alpha.1",
+    "@techreloaded/websmith-darwin-x64": "0.1.0-alpha.1",
+    "@techreloaded/websmith-linux-x64": "0.1.0-alpha.1",
+    "@techreloaded/websmith-win32-x64": "0.1.0-alpha.1"
+  }
+}
