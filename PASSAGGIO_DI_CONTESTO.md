@@ -208,3 +208,19 @@ costruzione PyInstaller del motore Python autonomo. La macchina non è autentica
 su npm: non è stata verificata l'autorizzazione allo scope né pubblicato alcunché.
 Vedere README per istruzioni e limiti. Non confondere preparazione locale,
 verifica su tutti i sistemi e pubblicazione effettiva del pacchetto.
+
+
+## Decisione del 26 ottobre 2026: GitHub senza npm
+
+L'utente, dopo confronto con i colleghi, ha abbandonato npm e richiesto un
+`setup.sh` sul modello di archetipo-workshop. Ha esplicitamente autorizzato a
+rendere pubblico websmith-cli per consentire curl senza login. Nessun pacchetto
+npm è stato pubblicato. I sorgenti della distribuzione npm sono rimossi; il file
+locale di recupero npm è ignorato, non letto e non incluso nella distribuzione.
+La distribuzione usa eseguibili autonomi in GitHub Releases e verifica SHA-256.
+Vedere README per sistemi supportati e istruzioni. `init` resta da implementare.
+
+Il cambio di visibilità è stato tentato ma GitHub lo ha rifiutato: `gpuliti` ha
+permesso push, non admin. Il repository resta privato fino all'intervento di un
+amministratore; il README distingue il comando autenticato da quello pubblico.
+Le sette prove locali del motore e dell'installer sono riuscite.

@@ -8,3 +8,6 @@ __pycache__/
 node_modules/
 *.tgz
 npm/websmith-*/bin/
+
+# Local account recovery material: never distribute.
+**/*recovery_codes*

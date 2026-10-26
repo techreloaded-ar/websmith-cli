@@ -1,9 +1,0 @@
-{
-  "name": "websmith-distribution",
-  "private": true,
-  "scripts": {
-    "test": "node --test tests/npm-launcher.test.cjs",
-    "build:native": "python3 scripts/build-native.py",
-    "pack:npm": "npm pack ./npm/websmith"
-  }
-}

@@ -1,109 +1,95 @@
 # Websmith CLI
 
-Prima versione sperimentale del programma per siti indipendenti. Richiede Python
-3.11 o successivo. Il sito e il programma si trovano in cartelle separate.
+Programma deterministico per siti indipendenti. Il programma si installa sul
+computer; configurazione e sorgenti rimangono nella cartella di ciascun sito.
 
-## Installazione da GitHub
+## Installazione da GitHub (macOS e Linux x64)
 
-Il repository è privato: occorre un account GitHub autorizzato e Git configurato
-per accedervi. Per installare la prima versione:
-
-```bash
-pipx install 'git+https://github.com/techreloaded-ar/websmith-cli.git@v0.1.0a1'
-```
-
-Serve anche Git. `pipx` installa il programma in un ambiente Python separato;
-non scarica il programma dentro il sito. Usare un tag o un commit identificabile.
-
-Per provare la copia locale senza pubblicarla:
+Il comando senza login richiede che un amministratore renda pubblico il repository.
+Al momento della preparazione il repository è ancora privato. Gli utenti già
+abilitati possono usare GitHub CLI autenticata:
 
 ```bash
-python3.11 -m venv .venv
-.venv/bin/python -m pip install -c requirements.lock .
-.venv/bin/websmith --version
-.venv/bin/websmith --help
+gh api repos/techreloaded-ar/websmith-cli/contents/setup.sh -H 'Accept: application/vnd.github.raw+json' | bash
 ```
 
-## Sito indipendente
+Dopo il cambio di visibilità sarà disponibile:
 
-Da una cartella contenente `websmith.yaml`, anche da una sua sottocartella:
+```bash
+curl -fsSL https://raw.githubusercontent.com/techreloaded-ar/websmith-cli/main/setup.sh | bash
+```
+
+Lo script scarica l'eseguibile autonomo della release GitHub corrente, verifica
+il checksum SHA-256 e installa `~/.local/bin/websmith`. Non richiede Python,
+Node.js, npm o Git. Servono Bash, curl, unzip e shasum oppure sha256sum.
+Su Linux sono supportate le distribuzioni compatibili con Ubuntu 22.04 o successive.
+I target Mac sono Intel e Apple Silicon.
+
+Se la cartella non è già nel PATH, aggiungere alla configurazione della shell:
+
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
+
+Poi:
+
+```bash
+websmith --version
+websmith --help
+```
+
+Per scegliere una versione o una destinazione:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/techreloaded-ar/websmith-cli/main/setup.sh | WEBSMITH_VERSION=v0.1.0a1 WEBSMITH_INSTALL_DIR="$HOME/.local/bin" bash
+```
+
+Per aggiornare, rieseguire lo script. L'eseguibile precedente viene sostituito
+solo dopo download, checksum e verifica di avvio riusciti. Il checksum verifica
+la corrispondenza con gli asset della release, non è una firma indipendente.
+Lo script non modifica automaticamente il profilo della shell né crea siti.
+
+Su Windows scaricare `websmith-win32-x64.zip` dalla sezione Releases del repository,
+estrarre `websmith.exe` e aggiungere la sua cartella al PATH. Lo script Bash non
+è un installer Windows. Le versioni distribuite non hanno ancora firma digitale.
+
+## Utilizzo su un sito esistente
+
+Dalla cartella con `websmith.yaml`, anche dalle sue sottocartelle:
 
 ```bash
 websmith validate-site
-websmith inspect
 websmith validate-pages
 websmith render-page ID_PAGINA --all-langs
 ```
 
-Oppure indicare il sito esplicitamente, prima del comando:
+Oppure:
 
 ```bash
 websmith --site-root /percorso/del/sito validate-site
-websmith --site-root /percorso/del/sito render-page ID_PAGINA --all-langs
 ```
 
-I comandi storici con argomento sito restano disponibili dalla cartella che
-contiene `websites/`. Per i comandi che richiedono più argomenti posizionali,
-indicare il percorso assoluto del sito al posto del suo nome.
-`resolve-page` e `parse-component` interpretano ancora i percorsi relativi dalla
-cartella di esecuzione: usare percorsi assoluti per evitare ambiguità.
+`websmith init` e la configurazione degli agenti restano da implementare.
+Il nuovo TechReloaded sarà creato solo nel percorso scelto dall'utente.
+La guida `websmith HELP` conserva gli esempi storici; per le opzioni attuali usare
+`websmith COMANDO --help`. I percorsi relativi di `resolve-page` e `parse-component`
+restano riferiti alla cartella di esecuzione: usare percorsi assoluti.
 
-`websmith HELP` contiene la guida storica recuperata dall'originale: gli esempi
-`python3 scripts/websmith.py` si riferiscono alla precedente organizzazione.
-`websmith COMANDO --help` mostra le opzioni attuali.
+## Sviluppo
 
-Questa versione non include ancora `websmith init`, installazione delle skill,
-controllo della versione richiesta dal sito, sincronizzazione Git o pubblicazione.
-Non inizializza né migra automaticamente un sito esistente. Il nuovo TechReloaded
-sarà creato soltanto nel percorso scelto dall'utente.
-
-## Verifica
+Richiede Python 3.11+:
 
 ```bash
+python3.11 -m venv .venv
+.venv/bin/python -m pip install -c requirements.lock .
 .venv/bin/python -m unittest discover -s tests -v
-```
-
-La provenienza dei file recuperati è registrata in `PROVENANCE.json` con le
-impronte SHA-256 dei sorgenti originali. Le risorse comuni sono incluse nel
-pacchetto: l'installazione non dipende dalla cartella del motore originale.
-
-`requirements.lock` registra tutte le versioni delle librerie verificate con
-Python 3.11. I controlli GitHub usano queste versioni anche sulle altre versioni
-Python dichiarate nella matrice; tali esecuzioni remote non sono ancora avvenute.
-
-## Distribuzione npm in preparazione
-
-L'obiettivo concordato è installare il programma con:
-
-```bash
-npm install -g @techreloaded/websmith
-websmith version
-```
-
-Questo comando sarà disponibile dopo la pubblicazione su npm. Lo scope
-`@techreloaded` è indipendente dal proprietario GitHub `techreloaded-ar`.
-L'accesso npm allo scope deve ancora essere verificato: questa macchina non
-risulta autenticata su npm. Nessun pacchetto è stato pubblicato.
-
-Il pacchetto principale in `npm/websmith` avvia il motore autonomo della
-piattaforma, installato come dipendenza facoltativa selezionata da npm.
-Non occorrono Python, pipx o Git sul computer dell'utilizzatore per lavorare
-localmente. Occorrono Node.js 20+ e npm; non usare `--omit=optional`.
-I target iniziali sono macOS ARM64/Intel, Windows x64 e Linux x64.
-
-Per costruire il motore sulla propria piattaforma (solo sviluppo):
-
-```bash
 .venv/bin/python -m pip install PyInstaller==6.16.0
 .venv/bin/python scripts/build-native.py
-npm test
-npm pack ./npm/websmith
+.venv/bin/python scripts/package-native.py
 ```
 
-La preparazione degli altri sistemi è definita in
-`.github/workflows/native.yml`. Ogni sistema costruisce il proprio eseguibile;
-non viene simulata una compilazione per Windows da macOS.
-Le versioni npm usano `0.1.0-alpha.1`, equivalente alla versione Python `0.1.0a1`.
-Prima di pubblicare occorre verificare tutti gli eseguibili e pubblicare i
-pacchetti di piattaforma prima del pacchetto principale. `websmith init` resta
-un lavoro separato ancora da implementare.
+Le versioni delle librerie sono in `requirements.lock`; la provenienza dei file
+recuperati è in `PROVENANCE.json`. GitHub costruisce e verifica gli eseguibili
+per quattro piattaforme prima della distribuzione. I pacchetti npm sono stati
+abbandonati prima di qualsiasi pubblicazione. L'installazione pipx dal tag GitHub
+rimane possibile per chi preferisce il pacchetto Python.
