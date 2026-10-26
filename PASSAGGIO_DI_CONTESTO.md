@@ -224,3 +224,15 @@ Il cambio di visibilità è stato tentato ma GitHub lo ha rifiutato: `gpuliti` h
 permesso push, non admin. Il repository resta privato fino all'intervento di un
 amministratore; il README distingue il comando autenticato da quello pubblico.
 Le sette prove locali del motore e dell'installer sono riuscite.
+
+
+## Implementazione init — 26 ottobre 2026
+
+Versione preparata: 0.1.0a2. `websmith init` lavora nella cartella corrente,
+chiede i dati minimi e l'agente (Codex, Claude o nessuno), genera un sito minimo
+oppure aggiunge istruzioni mancanti a un manifest valido. Nessuna sovrascrittura,
+nessuna migrazione automatica di cartelle non vuote senza manifest. Ripetere init
+preserva il lavoro. Opzioni non interattive con `--yes`; vedere README e HELP.
+Il sito reale TechReloaded non è stato creato. Non è stato aggiunto FTP.
+Il repository risulta ancora privato: il comando curl pubblico richiede l'intervento
+di un amministratore. Le skill seguono le regole comuni locali in .websmith/rules.md.

@@ -69,7 +69,41 @@ Oppure:
 websmith --site-root /percorso/del/sito validate-site
 ```
 
-`websmith init` e la configurazione degli agenti restano da implementare.
+Dalla versione `0.1.0a2` puoi inizializzare una cartella vuota:
+
+```bash
+websmith init
+```
+
+Il comando chiede nome, identificativo, URL (può restare `https://example.test`),
+lingua iniziale (`it` o `en`) e agente (`codex`, `claude` o `none`). Installa regole,
+istruzioni locali e un sito minimo con una homepage, un template e CSS.
+Non scarica contenuti e non pubblica nulla. Dati, email e logo di esempio vanno
+personalizzati prima di un uso pubblico.
+
+Per eseguirlo senza domande:
+
+```bash
+websmith init --yes --name "Il mio sito" --agent codex
+websmith validate-site
+websmith validate-pages
+websmith render-page home
+websmith render-root-index
+```
+
+Apri `web/index.html` nel browser. Per cambiare il testo modifica
+`contents/it/pages/home.md` e rigenera la pagina. Per la lingua `en` il percorso
+è `contents/en/pages/home.md`. Puoi indicare una cartella già esistente con
+`websmith --site-root /percorso init`.
+
+`init` non sovrascrive file e ripeterlo su un sito inizializzato non lo modifica.
+Una cartella non vuota senza manifest viene rifiutata: nessuna migrazione implicita.
+Un sito con manifest valido riceve le istruzioni mancanti; istruzioni e guide già
+presenti restano invariate. Le regole comuni sono in `.websmith/rules.md`;
+i metadati e le impronte dei file installati sono in `.websmith/`.
+Le skill locali sono `.agents/skills/websmith-site/` per Codex e
+`.claude/skills/websmith-site/` per Claude. Il comando non installa gli agenti.
+L'aggiornamento delle istruzioni di un sito già inizializzato è un lavoro distinto.
 Il nuovo TechReloaded sarà creato solo nel percorso scelto dall'utente.
 La guida `websmith HELP` conserva gli esempi storici; per le opzioni attuali usare
 `websmith COMANDO --help`. I percorsi relativi di `resolve-page` e `parse-component`

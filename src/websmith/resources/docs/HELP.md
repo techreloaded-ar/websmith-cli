@@ -1,3 +1,16 @@
+# Inizializzazione locale (dalla versione 0.1.0a2)
+
+`websmith init` inizializza la cartella corrente con domande guidate. Richiede una
+cartella vuota oppure un sito con websmith.yaml valido. Non sovrascrive file.
+`websmith init --yes --name "Il mio sito" --agent codex` usa valori espliciti e
+predefiniti senza domande. Agenti: codex, claude, none. Lingue iniziali: it, en.
+Per tutte le opzioni: `websmith init --help`.
+Dopo init: `websmith validate-site`, `websmith validate-pages`,
+`websmith render-page home`, `websmith render-root-index`. Aprire web/index.html.
+FTP e pubblicazione non fanno parte dell'inizializzazione.
+
+La guida seguente documenta anche la precedente struttura del progetto.
+
 # HELP — Comandi Websmith
 
 In chat scrivi `HELP` per l'elenco oppure `HELP render-page` per un comando specifico.

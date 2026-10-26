@@ -3676,8 +3676,18 @@ def command_parse_component(args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Websmith deterministic site tooling")
     parser.add_argument("--site-root", type=Path, help="Independent site directory (before command)")
-    parser.add_argument("--version", action="version", version="websmith 0.1.0a1")
+    parser.add_argument("--version", action="version", version="websmith 0.1.0a2")
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    from .initialize import command_init
+    init_parser = subparsers.add_parser("init", help="Inizializza Websmith nella cartella corrente senza sovrascrivere file")
+    init_parser.add_argument("--yes", action="store_true", help="Usa i valori predefiniti senza domande")
+    init_parser.add_argument("--name", help="Nome del sito")
+    init_parser.add_argument("--id", help="Identificativo del sito")
+    init_parser.add_argument("--url", help="URL del sito; predefinito https://example.test")
+    init_parser.add_argument("--language", choices=["it", "en"], help="Lingua iniziale")
+    init_parser.add_argument("--agent", choices=["codex", "claude", "none"], help="Agente da configurare")
+    init_parser.set_defaults(func=command_init)
 
     inspect_parser = subparsers.add_parser("inspect", help="Inspect site structure without writing files")
     inspect_parser.add_argument("site", nargs="?", help="Website name under websites/")

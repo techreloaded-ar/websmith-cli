@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "websmith-cli"
-version = "0.1.0a1"
+version = "0.1.0a2"
 description = "Deterministic tooling for independent Markdown-first websites"
 readme = "README.md"
 requires-python = ">=3.11"
