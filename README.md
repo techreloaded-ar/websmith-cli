@@ -5,15 +5,7 @@ computer; configurazione e sorgenti rimangono nella cartella di ciascun sito.
 
 ## Installazione da GitHub (macOS e Linux x64)
 
-Il comando senza login richiede che un amministratore renda pubblico il repository.
-Al momento della preparazione il repository è ancora privato. Gli utenti già
-abilitati possono usare GitHub CLI autenticata:
-
-```bash
-gh api repos/techreloaded-ar/websmith-cli/contents/setup.sh -H 'Accept: application/vnd.github.raw+json' | bash
-```
-
-Dopo il cambio di visibilità sarà disponibile:
+Il repository è pubblico: installazione e aggiornamenti non richiedono login GitHub.
 
 ```bash
 curl -fsSL https://raw.githubusercontent.com/techreloaded-ar/websmith-cli/main/setup.sh | bash
@@ -135,3 +127,62 @@ recuperati è in `PROVENANCE.json`. GitHub costruisce e verifica gli eseguibili
 per quattro piattaforme prima della distribuzione. I pacchetti npm sono stati
 abbandonati prima di qualsiasi pubblicazione. L'installazione pipx dal tag GitHub
 rimane possibile per chi preferisce il pacchetto Python.
+
+## Importare un sito online (dalla versione 0.1.0a3)
+
+Nella cartella del progetto, dopo `websmith init` per un progetto nuovo:
+
+```bash
+websmith import https://www.esempio.it
+```
+
+Non serve indicare una cartella all'agente: il comando lavora dalla cartella
+corrente e crea `imports/www.esempio.it/`. È possibile acquisire anche senza un
+manifest: in quel caso l'operazione conserva solo la copia e il rapporto, senza
+inizializzare un progetto Websmith. Non eseguire init su quella cartella non
+vuota aspettandoti una conversione automatica.
+
+- `originals/` conserva i byte delle pagine e delle risorse scaricate.
+- `preview/` contiene HTML e CSS con i riferimenti acquisiti riscritti in locale;
+  aprire `preview/index.html` per scegliere la pagina da confrontare.
+- `REPORT.md` riassume pagine, errori e parti da esaminare con l'agente.
+- `report.json` conserva URL originali, redirect, percorsi, impronte e limiti.
+
+Il comando segue collegamenti HTML nello stesso indirizzo di origine (schema,
+host e porta). Un redirect iniziale, per esempio verso www, stabilisce l'origine
+finale; i redirect delle altre pagine non possono uscire dal sito. Scarica anche
+le risorse esterne referenziate esplicitamente da HTML e CSS, comprese quelle CDN.
+Rispetta robots.txt; i suoi eventuali intervalli prevalgono sul minimo richiesto.
+Un robots.txt non disponibile viene segnalato, con 404 trattato come assenza e
+401/403 come divieto. Sono applicati limiti su pagine, profondità, risorse, byte
+e timeout. I limiti predefiniti sono 30 pagine, profondità 3, 200 risorse,
+10 MB per file e 100 MB complessivi, con intervallo minimo 0,25 secondi.
+
+```bash
+websmith import https://www.esempio.it --max-pages 60 --max-depth 4
+websmith import https://www.esempio.it --output imports/seconda-prova
+websmith import --help
+```
+
+Una destinazione esistente viene rifiutata prima del download. Nessun sorgente
+Websmith viene cambiato. Per ripetere una prova usare una destinazione diversa.
+Codici di uscita: 0 acquisizione completata nei limiti, 1 errori di download o
+nessuna pagina acquisita (rapporto disponibile), 2 argomenti o destinazione errati.
+Le esclusioni per robots, profondità o numero massimo restano elencate anche
+quando il comando termina con successo: non è una garanzia di copia completa.
+
+Per siti Jimdo e altri CMS si recupera solo ciò che è pubblico nell'HTML iniziale:
+JavaScript non viene eseguito, i suoi import dinamici non vengono ricostruiti,
+iframe e contenuti dietro login non vengono acquisiti. Alcuni costrutti CSS o
+srcset con data URL possono richiedere revisione. Moduli, negozi, database e
+servizi del CMS non vengono trasferiti. Aprendo l'anteprima il browser può ancora
+contattare il sito originale tramite script, moduli o risorse non acquisite.
+
+Dopo l'acquisizione, aprire il progetto nell'agente e chiedere di leggere
+`REPORT.md`, proporre la conversione e trasformare prima una pagina rappresentativa
+in Markdown e template del sito. Confrontare con la copia originale, validare e
+rigenerare prima di estendere alle altre pagine. Nessuna traduzione o informazione
+editoriale è inventata dal comando. La pubblicazione è sempre distinta.
+
+Il motore autonomo include il bundle CA per HTTPS e mantiene la verifica dei
+certificati attiva. Per una CA aziendale si può indicare un bundle con SSL_CERT_FILE.

@@ -1,3 +1,15 @@
+# Importazione web (dalla versione 0.1.0a3)
+
+`websmith import URL` acquisisce pagine HTML pubbliche e risorse in
+imports/NOME-DOMINIO, senza modificare sorgenti o configurazione del sito.
+Leggere REPORT.md prima della conversione assistita dall'agente.
+Opzioni: `--output`, `--max-pages`, `--max-depth`, `--max-assets`,
+`--max-file-bytes`, `--max-total-bytes`, `--timeout`, `--delay`.
+Il download rispetta robots.txt. Non esegue JavaScript o script del sito.
+Una destinazione esistente non viene sovrascritta; usare --output per una nuova prova.
+Un sito già sviluppato con Websmith si copia manualmente e si controlla con init
+/ validate-site / validate-pages: non serve import folder.
+
 # Inizializzazione locale (dalla versione 0.1.0a2)
 
 `websmith init` inizializza la cartella corrente con domande guidate. Richiede una

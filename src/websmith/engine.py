@@ -3676,8 +3676,21 @@ def command_parse_component(args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Websmith deterministic site tooling")
     parser.add_argument("--site-root", type=Path, help="Independent site directory (before command)")
-    parser.add_argument("--version", action="version", version="websmith 0.1.0a2")
+    parser.add_argument("--version", action="version", version="websmith 0.1.0a3")
     subparsers = parser.add_subparsers(dest="command", required=True)
+
+    from .import_web import command_import
+    import_parser = subparsers.add_parser("import", help="Acquisisce un sito pubblico senza modificare i sorgenti Websmith")
+    import_parser.add_argument("url", help="URL http/https iniziale")
+    import_parser.add_argument("--output", help="Destinazione relativa nuova; predefinita imports/NOME-DOMINIO")
+    import_parser.add_argument("--max-pages", type=int, default=30)
+    import_parser.add_argument("--max-depth", type=int, default=3)
+    import_parser.add_argument("--max-assets", type=int, default=200)
+    import_parser.add_argument("--max-file-bytes", type=int, default=10_000_000)
+    import_parser.add_argument("--max-total-bytes", type=int, default=100_000_000)
+    import_parser.add_argument("--timeout", type=float, default=15)
+    import_parser.add_argument("--delay", type=float, default=0.25, help="Intervallo minimo fra richieste in secondi")
+    import_parser.set_defaults(func=command_import)
 
     from .initialize import command_init
     init_parser = subparsers.add_parser("init", help="Inizializza Websmith nella cartella corrente senza sovrascrivere file")

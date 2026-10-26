@@ -241,3 +241,19 @@ Chiarimento richiesto dall'utente: Websmith è il motore deterministico, non
 l'agente AI. Scegliere Codex o Claude durante init installa solo istruzioni locali;
 l'utente accede separatamente al proprio client AI e apre la cartella sito.
 Non sono integrate autenticazione AI o API e non viene attivato un abbonamento.
+
+
+## Importazione da web — versione 0.1.0a3
+
+L'utente ha verificato con successo init sul sito Pinguini Theater copiato a mano.
+Non serve import folder. È stato richiesto di implementare `websmith import URL`.
+La nuova acquisizione conserva originals/, preview/, REPORT.md e report.json
+in una destinazione nuova sotto imports/. Segue pagine della stessa origine e
+risorse HTML/CSS anche esterne; robots, limiti e timeout sono espliciti. Non
+esegue JS, non converte automaticamente in sorgenti Websmith e non pubblica.
+La conversione resta un lavoro dell'agente sulla copia acquisita.
+Nessun sito reale dell'utente è stato importato: i test usano un server sintetico.
+Vedere README per il percorso init → import → analisi con agente.
+
+Verifica durante lo sviluppo di import: il repository ora risulta pubblico; il
+precedente impedimento al download curl senza autenticazione è stato risolto.
