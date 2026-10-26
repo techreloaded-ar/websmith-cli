@@ -101,6 +101,14 @@ Una cartella non vuota senza manifest viene rifiutata: nessuna migrazione implic
 Un sito con manifest valido riceve le istruzioni mancanti; istruzioni e guide già
 presenti restano invariate. Le regole comuni sono in `.websmith/rules.md`;
 i metadati e le impronte dei file installati sono in `.websmith/`.
+Websmith non attiva un agente né si collega a un abbonamento AI. La scelta
+Codex/Claude configura esclusivamente istruzioni locali nella cartella sito.
+L'utilizzatore accede separatamente al proprio strumento AI, apre la cartella
+del sito e chiede all'agente di lavorare seguendo quelle istruzioni. Per Codex,
+l'accesso con ChatGPT avviene nel client Codex; un'integrazione API di Websmith
+non è necessaria né presente. Il browser ChatGPT non riceve automaticamente
+accesso ai file locali. Websmith funziona anche senza agente.
+
 Le skill locali sono `.agents/skills/websmith-site/` per Codex e
 `.claude/skills/websmith-site/` per Claude. Il comando non installa gli agenti.
 L'aggiornamento delle istruzioni di un sito già inizializzato è un lavoro distinto.

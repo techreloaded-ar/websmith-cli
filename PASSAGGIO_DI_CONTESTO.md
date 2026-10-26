@@ -236,3 +236,8 @@ preserva il lavoro. Opzioni non interattive con `--yes`; vedere README e HELP.
 Il sito reale TechReloaded non è stato creato. Non è stato aggiunto FTP.
 Il repository risulta ancora privato: il comando curl pubblico richiede l'intervento
 di un amministratore. Le skill seguono le regole comuni locali in .websmith/rules.md.
+
+Chiarimento richiesto dall'utente: Websmith è il motore deterministico, non
+l'agente AI. Scegliere Codex o Claude durante init installa solo istruzioni locali;
+l'utente accede separatamente al proprio client AI e apre la cartella sito.
+Non sono integrate autenticazione AI o API e non viene attivato un abbonamento.
