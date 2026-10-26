@@ -14,6 +14,7 @@ import shutil
 import ssl
 import tempfile
 import time
+import sys
 from urllib.error import HTTPError
 from urllib.parse import urldefrag, urljoin, urlsplit, urlunsplit
 from urllib.request import HTTPRedirectHandler, HTTPSHandler, Request, build_opener
@@ -62,6 +63,7 @@ class Importer:
         self.directory = directory
         self.scope: str | None = None
         self.robots: dict[str, RobotFileParser | None] = {}
+        self.robots_access_errors: dict[str, str] = {}
         self.records: dict[str, dict] = {}
         self.aliases: dict[str, str] = {}
         self.events: list[dict] = []
@@ -94,13 +96,20 @@ class Importer:
                     parser = RobotFileParser()
                     parser.disallow_all = True
                     self.robots[host] = parser
+                    self.robots_access_errors[host] = (
+                        f'Impossibile leggere {robot_url}: HTTP {exc.code}. '
+                        'Acquisizione fermata per accesso negato; non è una regola letta nel file robots.txt.'
+                    )
                 elif exc.code != 404:
                     self.event(robot_url, f'robots.txt non disponibile: HTTP {exc.code}', 'warning')
             except (OSError, ValueError) as exc:
                 self.event(robot_url, f'robots.txt non disponibile: {exc}', 'warning')
         parser = self.robots[host]
         if parser is not None and not parser.can_fetch(AGENT, url):
-            self.event(url, 'Escluso da robots.txt')
+            if host in self.robots_access_errors:
+                self.event(url, self.robots_access_errors[host], 'error')
+            else:
+                self.event(url, 'Escluso dalle regole lette in robots.txt')
             return False
         return True
 
@@ -332,7 +341,7 @@ class Importer:
     def report(self, seed):
         pages = [r for r in self.records.values() if r['kind'] == 'page']
         errors = [event for event in self.events if event['kind'] == 'error']
-        report = dict(format_version=1, source=seed, site_origin=self.scope, status='partial' if errors else 'acquired', limits={key: getattr(self.args, key) for key in ('max_pages', 'max_depth', 'max_assets', 'max_file_bytes', 'max_total_bytes', 'timeout', 'delay')}, downloaded_bytes=self.total, records=list(self.records.values()), aliases=self.aliases, events=self.events, limitations=['Acquisizione HTML pubblica senza login; JavaScript non eseguito.', 'Non sono trasferiti CMS, database, moduli funzionanti o servizi server.', 'La conversione in Markdown, template e componenti richiede revisione con agente.'])
+        report = dict(format_version=1, source=seed, site_origin=self.scope, status='failed' if not pages else 'partial' if errors else 'acquired', limits={key: getattr(self.args, key) for key in ('max_pages', 'max_depth', 'max_assets', 'max_file_bytes', 'max_total_bytes', 'timeout', 'delay')}, downloaded_bytes=self.total, records=list(self.records.values()), aliases=self.aliases, events=self.events, limitations=['Acquisizione HTML pubblica senza login; JavaScript non eseguito.', 'Non sono trasferiti CMS, database, moduli funzionanti o servizi server.', 'La conversione in Markdown, template e componenti richiede revisione con agente.'])
         (self.directory / 'report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2) + '\n', encoding='utf-8')
         lines = ['# Importazione Websmith', '', f'Origine: {seed}', f'Pagine: {len(pages)} — risorse: {len(self.records) - len(pages)} — errori: {len(errors)}', '', '## Pagine acquisite', '']
         lines += [f'- {r["url"]} → `{r["local"]}`' for r in pages]
@@ -356,7 +365,14 @@ def command_import(args):
         root = (args.site_root or Path.cwd()).resolve()
         if not root.is_dir():
             raise ValueError('La cartella di lavoro deve già esistere')
+        browser_mode = getattr(args, 'browser', False)
+        if (getattr(args, 'single_page', False) or getattr(args, 'browser_headless', False)) and not browser_mode:
+            raise ValueError('--single-page e --browser-headless richiedono --browser')
+        if browser_mode and not sys.stdin.isatty():
+            raise ValueError('La modalità browser richiede un terminale interattivo per confermare le pagine.')
         name = re.sub(r'[^a-zA-Z0-9.-]+', '-', urlsplit(seed).hostname)
+        if browser_mode:
+            name += '-browser'
         configured = Path(args.output) if args.output else Path('imports') / name
         if configured.is_absolute() or '..' in configured.parts:
             raise ValueError('--output deve essere un percorso relativo interno alla cartella corrente')
@@ -373,7 +389,11 @@ def command_import(args):
         destination.mkdir()
         stage = Path(tempfile.mkdtemp(prefix='.websmith-import-', dir=destination.parent))
         try:
-            importer = Importer(args, stage)
+            if browser_mode:
+                from .import_browser import BrowserImporter
+                importer = BrowserImporter(args, stage)
+            else:
+                importer = Importer(args, stage)
             importer.crawl(seed)
             importer.previews()
             pages, errors = importer.report(seed)
@@ -384,7 +404,12 @@ def command_import(args):
             shutil.rmtree(stage)
             shutil.rmtree(destination)
             raise
-        print(f'Importazione acquisita: {destination}\nPagine: {pages}. Risorse: {len(importer.records) - pages}. Errori: {errors}.\nLeggi {destination / "REPORT.md"}. Nessuna conversione automatica o pubblicazione.')
+        status = 'Importazione non riuscita' if not pages else 'Importazione parziale' if errors else 'Importazione acquisita'
+        print(f'{status}: {destination}\nPagine: {pages}. Risorse: {len(importer.records) - pages}. Errori: {errors}.')
+        if not pages or errors:
+            for event in importer.events[:5]:
+                print(f'  - {event["reason"]}')
+        print(f'Leggi {destination / "REPORT.md"}. Nessuna conversione automatica o pubblicazione.')
         return 0 if pages and not errors else 1
     except (OSError, ValueError) as exc:
         print(f'Importazione interrotta: {exc}')

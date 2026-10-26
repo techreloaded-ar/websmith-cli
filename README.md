@@ -186,3 +186,66 @@ editoriale è inventata dal comando. La pubblicazione è sempre distinta.
 
 Il motore autonomo include il bundle CA per HTTPS e mantiene la verifica dei
 certificati attiva. Per una CA aziendale si può indicare un bundle con SSL_CERT_FILE.
+
+## Salvataggio di pagine visibili nel browser (dalla versione 0.1.0a4)
+
+```bash
+websmith import https://www.play14.it --browser
+```
+
+Si apre una finestra Google Chrome dedicata, separata dal profilo abituale.
+Attendere che la pagina sia visibile, scorrere per caricare le immagini ed
+eseguire eventuali verifiche del sito direttamente nella finestra. Tornare al
+terminale e premere Invio per salvare la pagina visibile. Si può poi indicare
+l'URL della pagina successiva dello stesso sito; Invio senza URL termina.
+Per fermarsi dopo la prima pagina usare `--single-page`.
+
+Questa è un'acquisizione manuale, simile a salvare la pagina già aperta: non
+naviga automaticamente fra le pagine e non modifica le protezioni del browser.
+Se la pagina restituisce ancora accesso negato, viene segnalata senza acquisirla.
+Il crawler HTTP ordinario rimane distinto e continua a verificare robots.txt.
+Non esistono opzioni per risolvere automaticamente verifiche anti-bot.
+
+La destinazione predefinita è `imports/www.play14.it-browser/`, separata dalla
+precedente importazione HTTP. Usare `--output imports/nuova-copia` per una nuova
+sessione; nessuna acquisizione esistente viene sovrascritta. Nella stessa sessione
+le risorse già salvate sono condivise fra le pagine, senza sostituire una pagina
+acquisita in precedenza.
+
+- `originals/`: HTML iniziale e risposte delle risorse recuperate dal browser;
+- `rendered/`: HTML della pagina dopo l'esecuzione di JavaScript;
+- `screenshots/`: riferimento visivo PNG, fino a 20000 pixel di altezza;
+- `preview/`: copia locale con script, moduli e iframe disattivati;
+- `REPORT.md` e `report.json`: corrispondenze URL/file e parti mancanti.
+
+Le immagini, i font e i CSS effettivamente caricati dal browser vengono salvati
+anche se introdotti dinamicamente. Risorse non caricate, canvas, blob e dipendenze
+inaccessibili restano segnalati: non viene tentato un download aggiuntivo.
+Il browser esegue JavaScript durante la visita; l'anteprima conserva la struttura
+risultante e disattiva gli script. I riferimenti locali vengono riscritti, ma i
+collegamenti e le risorse mancanti possono ancora richiedere Internet.
+I limiti di pagine/risorse/byte si applicano ai contenuti acquisiti, non a tutto
+il traffico generato dal browser durante la visita. Non vengono esportati cookie
+né il profilo. CSS e immagini sono in `preview/assets/` con URL originali nel rapporto.
+La successiva conversione in Markdown e template è sempre svolta dall'agente.
+
+È necessario Google Chrome installato. In alternativa:
+
+```bash
+websmith browser-install
+websmith import https://www.play14.it --browser --browser-channel chromium
+```
+
+`browser-install` scarica Chromium nella cache dell'utente. Non serve installare
+Python, Node.js o npm. È supportato anche `--browser-channel msedge` se Microsoft
+Edge è installato. `websmith browser-install --check` verifica il driver incluso.
+Su Linux potrebbero servire le librerie di sistema richieste dal browser.
+
+Per le prove di integrazione su un sito locale, con browser installato:
+
+```bash
+WEBSMITH_BROWSER_TEST=1 .venv/bin/python -m unittest discover -s tests -v
+```
+
+L'opzione tecnica `--browser-headless` è destinata ai test: mantiene la conferma
+nel terminale e non fornisce una finestra per eseguire verifiche manuali.

@@ -4,11 +4,11 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "websmith-cli"
-version = "0.1.0a3"
+version = "0.1.0a4"
 description = "Deterministic tooling for independent Markdown-first websites"
 readme = "README.md"
 requires-python = ">=3.11"
-dependencies = ["PyYAML==6.0.3", "beautifulsoup4==4.14.3", "jsonschema==4.26.0", "certifi==2026.10.23"]
+dependencies = ["PyYAML==6.0.3", "beautifulsoup4==4.14.3", "jsonschema==4.26.0", "certifi==2026.10.23", "playwright==1.64.1"]
 
 [project.scripts]
 websmith = "websmith.engine:main"

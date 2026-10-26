@@ -1,3 +1,16 @@
+# Acquisizione browser manuale (dalla versione 0.1.0a4)
+
+`websmith import URL --browser` apre Chrome in una sessione dedicata.
+Scorrere e controllare la pagina; tornare al terminale e premere Invio per salvarla.
+Poi indicare il prossimo URL o Invio per terminare. `--single-page` salva una pagina.
+La copia è in imports/NOME-DOMINIO-browser/ con originals/, rendered/,
+screenshots/, preview/ e REPORT.md. Vengono salvate le risorse caricate dal browser.
+Nessun download supplementare delle risorse bloccate, nessun profilo esportato.
+Per una nuova sessione scegliere --output; niente sovrascritture.
+La modalità browser richiede un terminale interattivo e un browser installato.
+`websmith browser-install` installa Chromium; usare poi --browser-channel chromium.
+Il comando non converte in Markdown; l'agente lavora successivamente sulla copia.
+
 # Importazione web (dalla versione 0.1.0a3)
 
 `websmith import URL` acquisisce pagine HTML pubbliche e risorse in

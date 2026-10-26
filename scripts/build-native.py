@@ -12,7 +12,7 @@ if f'{os_name}-{cpu}' not in {'darwin-arm64', 'darwin-x64', 'linux-x64', 'win32-
 subprocess.run([
     sys.executable, '-m', 'PyInstaller', '--noconfirm', '--clean', '--onefile',
     '--name', 'websmith', '--paths', str(root / 'src'), '--collect-all', 'websmith',
-    '--collect-all', 'certifi', '--collect-all', 'jsonschema_specifications', '--copy-metadata', 'jsonschema',
+    '--collect-all', 'playwright', '--collect-all', 'certifi', '--collect-all', 'jsonschema_specifications', '--copy-metadata', 'jsonschema',
     '--distpath', str(root / 'dist/native'), '--workpath', str(root / 'build/native'),
     '--specpath', str(root / 'build'), str(root / 'src/websmith_native.py'),
 ], check=True, cwd=root)

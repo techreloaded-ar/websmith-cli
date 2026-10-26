@@ -11,12 +11,16 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 
 class SiteHandler(BaseHTTPRequestHandler):
     visits = []
+    robots_status = 200
 
     def log_message(self, *args):
         pass
 
     def do_GET(self):
         type(self).visits.append(self.path)
+        if self.path == '/robots.txt' and type(self).robots_status != 200:
+            self.send_error(type(self).robots_status)
+            return
         routes = {
             '/robots.txt': ('text/plain', b'User-agent: *\nDisallow: /blocked\n'),
             '/': ('text/html; charset=utf-8', b'''<html><head><base href="/"><link rel="stylesheet" href="/main.css" integrity="sha256-example"></head><body><h1>Original title</h1><img src="/image.png" srcset="/image.png 1x, /image.png?v=2 2x"><a href="/second#section">Second</a><a href="/blocked">Blocked</a><a href="https://example.invalid/external">External</a><form action="/submit"></form><script src="/app.js"></script></body></html>'''),
@@ -130,6 +134,22 @@ class ImportTests(unittest.TestCase):
             self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
             _, report = self.report(directory)
             self.assertEqual(report['aliases'][self.url + '/redirect'], self.url + '/second')
+
+    def test_denied_robots_is_reported_as_access_failure(self):
+        with tempfile.TemporaryDirectory() as directory:
+            SiteHandler.robots_status = 403
+            SiteHandler.visits.clear()
+            try:
+                result = self.cli(directory)
+            finally:
+                SiteHandler.robots_status = 200
+            self.assertEqual(result.returncode, 1)
+            self.assertIn('Importazione non riuscita', result.stdout)
+            self.assertIn('HTTP 403', result.stdout)
+            self.assertNotIn('/', SiteHandler.visits)
+            _, report = self.report(directory)
+            self.assertEqual(report['status'], 'failed')
+            self.assertTrue(any(e['kind'] == 'error' and 'HTTP 403' in e['reason'] for e in report['events']))
 
     def test_external_redirect_is_not_followed(self):
         with tempfile.TemporaryDirectory() as directory:

@@ -257,3 +257,17 @@ Vedere README per il percorso init → import → analisi con agente.
 
 Verifica durante lo sviluppo di import: il repository ora risulta pubblico; il
 precedente impedimento al download curl senza autenticazione è stato risolto.
+
+
+## Versione 0.1.0a4 — salvataggio browser manuale
+
+L'utente richiede HTML e immagini locali da usare per la conversione in Markdown.
+Play14.it restituisce HTTP403 ai download ordinari ma si apre nel suo browser.
+Aggiunta modalità `import URL --browser`: Chrome dedicato, conferma nel terminale,
+HTML iniziale e renderizzato, risorse già caricate, screenshot e anteprima statica.
+La raccolta consente più pagine dello stesso sito nella stessa sessione; nessuna
+navigazione automatica e nessun tentativo di risolvere verifiche anti-bot.
+Le risorse bloccate o non caricate sono segnalate. Nessun cookie/profilo esportato.
+`browser-install` può installare Chromium se Chrome non è disponibile.
+Corretta anche la diagnostica HTTP403 su robots: ora accesso negato e acquisizione
+fallita sono espliciti. Il file doc/ preesistente non appartiene a queste modifiche.

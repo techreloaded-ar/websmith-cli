@@ -3676,7 +3676,7 @@ def command_parse_component(args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Websmith deterministic site tooling")
     parser.add_argument("--site-root", type=Path, help="Independent site directory (before command)")
-    parser.add_argument("--version", action="version", version="websmith 0.1.0a3")
+    parser.add_argument("--version", action="version", version="websmith 0.1.0a4")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     from .import_web import command_import
@@ -3690,7 +3690,16 @@ def build_parser() -> argparse.ArgumentParser:
     import_parser.add_argument("--max-total-bytes", type=int, default=100_000_000)
     import_parser.add_argument("--timeout", type=float, default=15)
     import_parser.add_argument("--delay", type=float, default=0.25, help="Intervallo minimo fra richieste in secondi")
+    import_parser.add_argument("--browser", action="store_true", help="Salva pagine confermate in una finestra del browser")
+    import_parser.add_argument("--browser-headless", action="store_true", help="Avvia senza finestra, per prove tecniche; non risolve le verifiche del sito")
+    import_parser.add_argument("--single-page", action="store_true", help="Con --browser termina dopo la prima pagina")
+    import_parser.add_argument("--browser-channel", choices=["chrome", "chromium", "msedge"], default="chrome")
     import_parser.set_defaults(func=command_import)
+    from .import_browser import command_browser_install
+    browser_install_parser = subparsers.add_parser("browser-install", help="Installa Chromium per l’acquisizione browser (facoltativo se Chrome è presente)")
+    browser_install_parser.add_argument("--check", action="store_true", help="Verifica il driver incluso senza scaricare Chromium")
+    browser_install_parser.set_defaults(func=command_browser_install)
+
 
     from .initialize import command_init
     init_parser = subparsers.add_parser("init", help="Inizializza Websmith nella cartella corrente senza sovrascrivere file")
