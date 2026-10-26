@@ -26,14 +26,14 @@ jobs:
         with:
           python-version: '3.11'
       - run: python -m pip install -c requirements.lock . PyInstaller==6.16.0
-      - name: Install test browser (Linux)
+      - name: Verify preinstalled test browser (Linux)
         if: runner.os == 'Linux'
-        run: python -m playwright install --with-deps chromium
+        run: google-chrome --version
       - run: python scripts/build-native.py
       - run: python -m unittest discover -s tests -v
         env:
           WEBSMITH_BROWSER_TEST: ${{ runner.os == 'Linux' && '1' || '' }}
-          WEBSMITH_BROWSER_CHANNEL: chromium
+          WEBSMITH_BROWSER_CHANNEL: chrome
           WEBSMITH_TEST_BINARY: ${{ github.workspace }}/dist/native/websmith${{ matrix.target == 'win32-x64' && '.exe' || '' }}
       - name: Verify bundled browser driver
         shell: bash

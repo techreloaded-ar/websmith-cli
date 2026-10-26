@@ -194,7 +194,8 @@ websmith import https://www.play14.it --browser
 ```
 
 Si apre una finestra Google Chrome dedicata, separata dal profilo abituale.
-Attendere che la pagina sia visibile, scorrere per caricare le immagini ed
+Attendere che la pagina sia visibile, chiudere eventuali banner dei cookie,
+scorrere per caricare le immagini ed
 eseguire eventuali verifiche del sito direttamente nella finestra. Tornare al
 terminale e premere Invio per salvare la pagina visibile. Si può poi indicare
 l'URL della pagina successiva dello stesso sito; Invio senza URL termina.

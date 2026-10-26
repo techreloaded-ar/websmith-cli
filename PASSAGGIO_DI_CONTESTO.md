@@ -271,3 +271,10 @@ Le risorse bloccate o non caricate sono segnalate. Nessun cookie/profilo esporta
 `browser-install` può installare Chromium se Chrome non è disponibile.
 Corretta anche la diagnostica HTTP403 su robots: ora accesso negato e acquisizione
 fallita sono espliciti. Il file doc/ preesistente non appartiene a queste modifiche.
+
+La prova reale sulla homepage pubblica di play14.it con Chrome è riuscita (HTTP200):
+una pagina, HTML originale/renderizzato, screenshot e 10 risorse di cui 4 immagini.
+I file di prova sono temporanei, nessuna modifica alla cartella play14 dell'utente.
+Le 26 prove locali sono riuscite, incluse tre integrazioni reali con Chrome;
+le tre integrazioni passano anche con l'eseguibile autonomo. Il workflow Linux
+usa Chrome preinstallato per evitare un download di Chromium durante la verifica.
