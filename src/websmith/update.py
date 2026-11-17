@@ -189,7 +189,7 @@ def command_update(args) -> int:
         if proposals:
             print('Integrazione manuale necessaria per i file personalizzati elencati. '
                   'Le proposte non sono attive; confrontarle con i file locali, poi ripetere update.')
-        for legacy in ('.websmith/rules.md', 'EDITORIAL_GUIDE.md'):
+        for legacy in ('.websmith/rules.md',):
             if (root / legacy).exists():
                 print(f'File precedente conservato: {legacy}. Verificare eventuali rimandi o regole in conflitto.')
         print('Aggiornamento completato. Contenuti, template, CSS, output e file .local.md conservati.')

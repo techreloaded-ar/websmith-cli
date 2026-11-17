@@ -163,7 +163,7 @@ written only to the appropriate local file. No local file is required.
 Other entry points still use installation hashes to preserve custom instructions,
 with replacements proposed under `.websmith/update-proposals/VERSION/` when
 needed. Such proposals, especially AGENTS.md references, must be integrated
-explicitly. Legacy `EDITORIAL_GUIDE.md` and `.websmith/rules.md` are preserved.
+explicitly. The legacy `.websmith/rules.md` file is preserved.
 `update --dry-run` writes nothing. By default, update checks published GitHub releases (including prereleases).
 A native macOS/Linux executable is replaced only by a strictly newer release,
 after SHA-256, startup, and version checks. Equal or newer local versions are

@@ -103,8 +103,7 @@ raccoglie voce, pubblico e lessico; le regole editoriali governano la revisione.
 Le proposte TechReloaded nei modelli editoriali sono esempi da confermare,
 non preferenze predefinite. Le personalizzazioni si scrivono nei corrispondenti file `.local.md`.
 Nei nuovi siti `.websmith/rules.md` non viene più creato; eventuali file legacy
-restano inalterati. I siti già inizializzati non vengono migrati automaticamente;
-anche un precedente `EDITORIAL_GUIDE.md` viene conservato.
+restano inalterati. I siti già inizializzati non vengono migrati automaticamente.
 
 I metadati e le impronte dei file installati sono in `.websmith/`.
 Websmith non attiva un agente né si collega a un abbonamento AI. La scelta
@@ -177,7 +176,7 @@ versione di `AGENTS.md`, integrarne i riferimenti alle coppie base/locale perch�
 l'agente applichi il nuovo modello. Le proposte modificate non sono sovrascritte.
 
 Il comando conserva contenuti, manifest, template, CSS e HTML. Mantiene anche
-`.websmith/rules.md` ed eventuale `EDITORIAL_GUIDE.md`, segnalando che occorre
+il precedente `.websmith/rules.md`, segnalando che occorre
 verificare rimandi e conflitti. I metadati distinguono la versione usata per init
 da quella delle istruzioni proposte e registrano i file ancora da integrare.
 L'uscita 0 indica che il comando è terminato, anche quando restano proposte da integrare;

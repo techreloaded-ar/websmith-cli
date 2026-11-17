@@ -37,8 +37,8 @@ specifiche Codex/Claude rimandano ad `AGENTS.md`. Websmith non installa o avvia
 l'agente, non collega un abbonamento AI e non pubblica il sito.
 
 Le guide esistenti sono preservate. Un sito già inizializzato non viene migrato
-automaticamente: i vecchi `.websmith/rules.md` ed `EDITORIAL_GUIDE.md` possono
-restare presenti, ma nei nuovi siti non vengono creati.
+automaticamente: il vecchio `.websmith/rules.md` può restare presente,
+ma nei nuovi siti non viene creato.
 
 ## Aggiornare le istruzioni di un sito esistente
 
@@ -94,7 +94,7 @@ versione di `AGENTS.md`, integrarne i riferimenti alle coppie base/locale perch�
 l'agente applichi il nuovo modello. Le proposte modificate non sono sovrascritte.
 
 Il comando conserva contenuti, manifest, template, CSS e HTML. Mantiene anche
-`.websmith/rules.md` ed eventuale `EDITORIAL_GUIDE.md`, segnalando che occorre
+il precedente `.websmith/rules.md`, segnalando che occorre
 verificare rimandi e conflitti. I metadati distinguono la versione usata per init
 da quella delle istruzioni proposte e registrano i file ancora da integrare.
 L'uscita 0 indica che il comando è terminato, anche quando restano proposte da integrare;

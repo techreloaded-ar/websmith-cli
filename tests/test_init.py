@@ -62,7 +62,6 @@ class InitTests(unittest.TestCase):
             (root / 'AGENTS.md').write_text('Existing instructions')
             (root / 'TONE_OF_VOICE.md').write_text('Existing voice')
             (root / 'EDITORIAL_RULES.md').write_text('Existing editorial rules')
-            (root / 'EDITORIAL_GUIDE.md').write_text('Legacy editorial guide')
             (root / '.websmith').mkdir()
             (root / '.websmith/rules.md').write_text('Legacy local rules')
             before = self.snapshot(root)

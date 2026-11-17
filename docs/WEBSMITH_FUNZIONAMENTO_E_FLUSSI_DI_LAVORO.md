@@ -153,7 +153,7 @@ Le basi sono aggiornate da Websmith; le personalizzazioni appartengono ai file `
 
 Anche i modelli di `AGENTS.md`, `CLAUDE.md` e delle istruzioni operative Codex/Claude sono file esterni. Per Codex viene creata `.agents/skills/websmith-site/SKILL.md`; per Claude vengono creati `CLAUDE.md` e `.claude/skills/websmith-site/SKILL.md`. Questi riferimenti indirizzano l'agente ad `AGENTS.md`.
 
-Nei nuovi siti `.websmith/rules.md` non viene più creato. I precedenti `.websmith/rules.md` ed `EDITORIAL_GUIDE.md`, se presenti, restano inalterati. L’aggiornamento esplicito si esegue con `websmith update`; l’integrazione di personalizzazioni e vecchi riferimenti richiede comunque una revisione.
+Nei nuovi siti `.websmith/rules.md` non viene più creato. Il precedente `.websmith/rules.md`, se presente, resta inalterato. L’aggiornamento esplicito si esegue con `websmith update`; l’integrazione di personalizzazioni e vecchi riferimenti richiede comunque una revisione.
 
 ### Aggiornare le istruzioni di un sito esistente
 
@@ -209,7 +209,7 @@ versione di `AGENTS.md`, integrarne i riferimenti alle coppie base/locale perch�
 l'agente applichi il nuovo modello. Le proposte modificate non sono sovrascritte.
 
 Il comando conserva contenuti, manifest, template, CSS e HTML. Mantiene anche
-`.websmith/rules.md` ed eventuale `EDITORIAL_GUIDE.md`, segnalando che occorre
+il precedente `.websmith/rules.md`, segnalando che occorre
 verificare rimandi e conflitti. I metadati distinguono la versione usata per init
 da quella delle istruzioni proposte e registrano i file ancora da integrare.
 L'uscita 0 indica che il comando è terminato, anche quando restano proposte da integrare;
