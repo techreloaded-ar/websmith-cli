@@ -25,7 +25,7 @@ class InitTests(unittest.TestCase):
             root = Path(directory)
             self.ok(self.cli(root, 'init', '--yes', '--name', 'Caffè & Studio', '--agent', 'codex'))
             self.assertTrue((root / '.agents/skills/websmith-site/SKILL.md').is_file())
-            from websmith.initialize import RULES_ROOT
+            RULES_ROOT = Path(__file__).resolve().parents[1] / 'src/websmith/resources/rules'
             for name in ('AGENTS.md', 'COMPOSITION_GUIDE.md', 'TONE_OF_VOICE.md', 'EDITORIAL_RULES.md'):
                 self.assertEqual((root / name).read_bytes(), (RULES_ROOT / name).read_bytes())
             self.assertFalse((root / '.websmith/rules.md').exists())
