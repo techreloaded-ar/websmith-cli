@@ -217,8 +217,22 @@ Rileggi il testo corretto con il testo di partenza accanto.
 - I paragrafi finiscono su un fatto?
 - C'è una frase che potresti spostare in un altro testo senza cambiarla?
 - La persona narrativa è la stessa dall'inizio alla fine?
+- I tempi verbali rispettano le informazioni della fonte, senza suggerire che un problema sia risolto o un progetto concluso, né che una condizione passata sia ancora attuale senza conferma?
 - Letto ad alta voce, sembra una persona che racconta?
 - Ogni taglio è riportato nelle note?
+
+## 1.12 Tempi verbali e stato del progetto
+
+Non trasformare automaticamente il contesto in un passato concluso. Raccontare un intervento già avvenuto non significa che il problema sia risolto, che le caratteristiche del sistema siano cambiate o che il progetto sia terminato. Evita una sequenza di imperfetti usati solo perché il racconto riguarda un progetto iniziato nel passato.
+
+Scegli i tempi verbali in base alle informazioni della fonte:
+
+- **Condizioni ancora attuali:** usa il presente se la fonte ne conferma la validità attuale. Esempio: «La piattaforma è complessa».
+- **Azioni concluse:** usa il passato prossimo o il passato remoto, secondo il registro del testo. Esempio: «Il team ha proposto un esperimento».
+- **Condizioni riferite a un periodo passato:** usa l'imperfetto quando serve a descrivere quel periodo. Esempio: «Durante la migrazione, il team lavorava su due sistemi».
+- **Stato attuale non specificato:** non dedurre né la permanenza né la risoluzione del problema. Mantieni il riferimento al periodo descritto, senza introdurre un confronto con il presente, e segnala nelle note editoriali l'incertezza quando è rilevante per il racconto.
+
+Non uniformare tutti i verbi allo stesso tempo e non sostituire meccanicamente l'imperfetto con il presente: anche affermare che una condizione persiste richiede una conferma nella fonte.
 
 # Parametri editoriali del sito
 
