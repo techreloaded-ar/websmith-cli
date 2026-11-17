@@ -1,5 +1,7 @@
 # Regole editoriali
 
+> Base gestita da Websmith. Dopo questo file leggere `EDITORIAL_RULES.local.md`, se presente: le indicazioni locali integrano e prevalgono sui punti corrispondenti. L'assenza del file locale è normale. Per personalizzare le regole del sito, l'agente scrive solo nel file `.local.md`, senza modificare questa base.
+
 **Stato:** quarta versione
 **Data:** 15 novembre 2026
 

@@ -40,6 +40,66 @@ Le guide esistenti sono preservate. Un sito già inizializzato non viene migrato
 automaticamente: i vecchi `.websmith/rules.md` ed `EDITORIAL_GUIDE.md` possono
 restare presenti, ma nei nuovi siti non vengono creati.
 
+## Aggiornare le istruzioni di un sito esistente
+
+Dalla versione `0.1.0a6`, nella cartella del sito già inizializzato:
+
+```bash
+websmith update --dry-run
+websmith update
+```
+
+Da un'altra posizione usare `websmith --site-root /percorso/del/sito update`.
+Dalla versione `0.1.0a8`, `update` controlla le release pubblicate su GitHub,
+comprese alpha e beta, e confronta i numeri di versione. Scarica l'eseguibile della
+piattaforma solo se la release è più recente: con una versione locale uguale o
+successiva non scarica né sostituisce il programma e non esegue downgrade.
+Non viene eseguito alcun `git pull`, né modificato il repository del sito.
+
+Prima della sostituzione verifica SHA-256, avvio e versione dell'eseguibile;
+in caso di verifica fallita conserva o ripristina il binario precedente. Avvia
+poi il nuovo programma per aggiornare le regole del sito con i nuovi modelli.
+Se questa seconda fase fallisce, il nuovo programma resta installato e il comando
+segnala di correggere l'errore e ripetere update.
+
+L'autoaggiornamento del binario supporta le installazioni autonome macOS/Linux.
+Per esecuzioni Python e per Windows, se è disponibile un binario più recente,
+il comando richiede l'installazione della release; non sostituisce un interprete
+Python o un eseguibile Windows in uso.
+
+`--dry-run` controlla la release senza scaricare eseguibili o scrivere file. Se è
+più recente, segnala che le regole saranno aggiornate dai modelli di quella release;
+non simula le differenze di modelli che non ha scaricato. Se il binario è già aggiornato,
+mostra il piano delle regole locali. Con `--offline` aggiorna solo le regole usando
+la versione già installata, senza accedere alla rete. Un errore di rete interrompe
+l'aggiornamento senza cambiare il sito; non viene ignorato automaticamente.
+Fuori da un sito, `update` aggiorna soltanto il programma.
+
+Dalla versione `0.1.0a7` le tre guide sono basi gestite da Websmith: vengono
+aggiunte o sostituite con i modelli della versione installata, anche se erano
+state modificate direttamente. Le basi sostituite sono conservate per recupero
+in `.websmith/update-backups/VERSIONE/IMPRONTA/`; quelle copie non sono regole attive.
+
+Le personalizzazioni vanno esclusivamente nei file facoltativi corrispondenti:
+`COMPOSITION_GUIDE.local.md`, `TONE_OF_VOICE.local.md`, `EDITORIAL_RULES.local.md`.
+L'agente legge prima la base e poi il file locale: il locale integra la base e
+prevale sui punti che modifica. Quando l'utente chiede una modifica alle regole,
+l'agente scrive solo nel file locale. `init` non crea file locali vuoti;
+la loro assenza è normale. `update` non li crea, modifica o elimina.
+
+Per gli altri punti di ingresso (`AGENTS.md`, skill, `CLAUDE.md`) resta il confronto
+con le impronte: i file personalizzati o privi di una base nota sono conservati,
+con proposte in `.websmith/update-proposals/VERSIONE/`. Se viene proposta una nuova
+versione di `AGENTS.md`, integrarne i riferimenti alle coppie base/locale perché
+l'agente applichi il nuovo modello. Le proposte modificate non sono sovrascritte.
+
+Il comando conserva contenuti, manifest, template, CSS e HTML. Mantiene anche
+`.websmith/rules.md` ed eventuale `EDITORIAL_GUIDE.md`, segnalando che occorre
+verificare rimandi e conflitti. I metadati distinguono la versione usata per init
+da quella delle istruzioni proposte e registrano i file ancora da integrare.
+L'uscita 0 indica che il comando è terminato, anche quando restano proposte da integrare;
+l'uscita 2 segnala un errore. `--dry-run` non scrive alcun file.
+
 ## Ispezione e validazione
 
 Nelle righe con `SITO` obbligatorio usare il percorso assoluto della cartella del

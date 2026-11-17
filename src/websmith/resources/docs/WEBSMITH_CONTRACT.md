@@ -152,8 +152,29 @@ TechReloaded proposals remain explicitly unconfirmed examples.
 
 Editorial notes must not enter publishable source bodies or bound editorial
 fields. Instruction files do not authorize remote publication. Already
-initialized sites are not automatically migrated; legacy `EDITORIAL_GUIDE.md`
-and `.websmith/rules.md` files are preserved.
+initialized sites are not migrated by init. Explicit `websmith update` replaces
+`COMPOSITION_GUIDE.md`, `TONE_OF_VOICE.md`, and `EDITORIAL_RULES.md` with bundled
+bases, saving previous bytes under `.websmith/update-backups/VERSION/HASH/`.
+Optional matching `.local.md` files are never created, modified, or removed by
+update. Agents read each base then its local file; local additions and overrides
+prevail on the corresponding points. Rule edits requested by users must be
+written only to the appropriate local file. No local file is required.
+
+Other entry points still use installation hashes to preserve custom instructions,
+with replacements proposed under `.websmith/update-proposals/VERSION/` when
+needed. Such proposals, especially AGENTS.md references, must be integrated
+explicitly. Legacy `EDITORIAL_GUIDE.md` and `.websmith/rules.md` are preserved.
+`update --dry-run` writes nothing. By default, update checks published GitHub releases (including prereleases).
+A native macOS/Linux executable is replaced only by a strictly newer release,
+after SHA-256, startup, and version checks. Equal or newer local versions are
+never overwritten. Git repositories are not pulled or changed. The new binary
+runs `update --offline` to refresh site rules. If that step fails, the binary
+stays updated and the failure is reported for retry. Python and Windows installs
+currently require manual binary installation when a newer release is available.
+`--offline` skips all network operations and uses bundled models only. Network
+errors stop before changes to site files. `--dry-run` retrieves metadata only;
+with a newer release it reports the upgrade without simulating unseen models.
+Update does not change site content, layout, or generated output.
 
 ## Component Catalog Contract
 

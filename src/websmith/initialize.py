@@ -15,6 +15,7 @@ import yaml
 from . import __version__
 
 RULES_ROOT = Path(__file__).resolve().parent / 'resources' / 'rules'
+BASE_GUIDES = ('COMPOSITION_GUIDE.md', 'TONE_OF_VOICE.md', 'EDITORIAL_RULES.md')
 
 
 def rule_text(name: str) -> str:

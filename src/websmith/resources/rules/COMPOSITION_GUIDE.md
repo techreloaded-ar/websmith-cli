@@ -1,5 +1,7 @@
 # Composizione del sito
 
+> Base gestita da Websmith. Dopo questo file leggere `COMPOSITION_GUIDE.local.md`, se presente: le indicazioni locali integrano e prevalgono sui punti corrispondenti. L'assenza del file locale è normale. Per personalizzare le regole del sito, l'agente scrive solo nel file `.local.md`, senza modificare questa base.
+
 ## Regole tecniche
 
 Il motore valida e genera HTML in modo deterministico; non inventa contenuti o traduzioni. I sorgenti autorevoli sono Markdown, template, componenti, CSS e media. Le modifiche durature vanno riportate nei sorgenti, non solo in `web/`.
@@ -93,7 +95,7 @@ Quando l'utente chiede HELP, spiegare scopo, sintassi ed esempi dei comandi in i
 
 ## Composizione iniziale
 
-I percorsi e i comandi descritti sotto si riferiscono al sito minimo creato da init. Su un sito esistente verificare il manifest e personalizzare questa guida prima di applicarli.
+I percorsi e i comandi descritti sotto si riferiscono al sito minimo creato da init. Su un sito esistente verificare il manifest e documentare percorsi e comandi specifici in `COMPOSITION_GUIDE.local.md` prima di applicarli.
 
 Per lingua canonica, lingue disponibili e percorsi leggere `websmith.yaml`. Nel sito iniziale la homepage è `contents/<lingua>/pages/home.md`.
 Modificare i testi nel Markdown e la struttura in `templates/html/page.html`.

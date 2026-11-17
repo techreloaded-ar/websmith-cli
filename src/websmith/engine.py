@@ -3713,6 +3713,12 @@ def build_parser() -> argparse.ArgumentParser:
     init_parser.add_argument("--agent", choices=["codex", "claude", "none"], help="Agente da configurare")
     init_parser.set_defaults(func=command_init)
 
+    from .update import command_update
+    update_parser = subparsers.add_parser("update", help="Aggiorna Websmith da GitHub e le regole del sito, conservando i file locali")
+    update_parser.add_argument("--dry-run", action="store_true", help="Mostra gli aggiornamenti senza modificare file")
+    update_parser.add_argument("--offline", action="store_true", help="Usa solo il programma e i modelli già installati, senza rete")
+    update_parser.set_defaults(func=command_update)
+
     inspect_parser = subparsers.add_parser("inspect", help="Inspect site structure without writing files")
     inspect_parser.add_argument("site", nargs="?", help="Website name under websites/")
     inspect_parser.set_defaults(func=command_inspect)
