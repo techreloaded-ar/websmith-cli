@@ -11,6 +11,8 @@ from unittest.mock import patch
 
 class UpdateTests(unittest.TestCase):
     def cli(self, root, *args):
+        if args and args[0] == 'init':
+            args = (*args, '--offline')
         executable = [os.environ['WEBSMITH_TEST_BINARY']] if os.environ.get('WEBSMITH_TEST_BINARY') else [sys.executable, '-m', 'websmith']
         if args and args[0] == 'update':
             args = (*args, '--offline')
@@ -111,7 +113,7 @@ class UpdateTests(unittest.TestCase):
             output = self.ok(self.cli(root, 'update'))
             self.assertIn('Integrazione manuale necessaria', output)
             self.assertEqual((root / 'AGENTS.md').read_text(), 'Le mie istruzioni')
-            proposal = root / f'.websmith/update-proposals/{__version__}/AGENTS.md'
+            proposal = next((root / '.websmith/update-proposals').glob('*/AGENTS.md'))
             self.assertTrue(proposal.is_file())
             before = self.snapshot(root)
             self.ok(self.cli(root, 'update'))

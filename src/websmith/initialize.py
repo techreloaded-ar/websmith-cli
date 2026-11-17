@@ -1,4 +1,4 @@
-"""Conservative, offline initialization of a site in the selected directory."""
+"""Conservative initialization using externally distributed instructions."""
 from __future__ import annotations
 
 import hashlib
@@ -7,6 +7,7 @@ import re
 import sys
 import tempfile
 import unicodedata
+import zipfile
 from pathlib import Path
 from urllib.parse import urlparse
 
@@ -18,10 +19,6 @@ RULES_ROOT = Path(__file__).resolve().parent / 'resources' / 'rules'
 BASE_GUIDES = ('COMPOSITION_GUIDE.md', 'TONE_OF_VOICE.md', 'EDITORIAL_RULES.md')
 
 
-def rule_text(name: str) -> str:
-    return (RULES_ROOT / name).read_text(encoding='utf-8')
-
-
 def slug(value: str) -> str:
     ascii_name = unicodedata.normalize('NFKD', value).encode('ascii', 'ignore').decode()
     return re.sub(r'[^a-z0-9]+', '-', ascii_name.lower()).strip('-') or 'sito'
@@ -31,7 +28,12 @@ def ask(label: str, default: str) -> str:
     return input(f'{label} [{default}]: ').strip() or default
 
 
-def agent_files(agent: str) -> dict[str, str]:
+def agent_files(agent: str, resources: dict[str, str] | None = None) -> dict[str, str]:
+    if resources is None:
+        from .rule_source import load
+        resources, _ = load(offline=True)
+    def rule_text(name):
+        return resources["rules/" + name]
     files = {name: rule_text(name) for name in (
         'AGENTS.md', 'COMPOSITION_GUIDE.md', 'TONE_OF_VOICE.md', 'EDITORIAL_RULES.md',
     )}
@@ -172,7 +174,9 @@ def command_init(args) -> int:
         agent = args.agent or (ask('Agente: codex, claude, none', 'codex') if interactive else 'none')
         if agent not in {'codex', 'claude', 'none'}:
             raise ValueError('Agente non supportato. Usa codex, claude oppure none.')
-        files = agent_files(agent)
+        from .rule_source import load
+        resources, revision = load(offline=getattr(args, "offline", False))
+        files = agent_files(agent, resources)
         if existing:
             # An existing entry point belongs to the site; provide instructions without editing it.
             files = {name: text for name, text in files.items() if not (root / name).exists() and not (root / name).is_symlink()}
@@ -196,11 +200,11 @@ def command_init(args) -> int:
                 _, errors = validate_site_manifest(str(stage))
                 if errors:
                     raise ValueError('Configurazione iniziale non valida:\n' + '\n'.join(errors))
-        files['.websmith/project.json'] = json.dumps({'format_version': 1, 'websmith_version': __version__, 'agent': agent}, indent=2) + '\n'
+        files['.websmith/project.json'] = json.dumps({'format_version': 1, 'websmith_version': __version__, 'agent': agent, 'instructions_revision': revision}, indent=2) + '\n'
         inventory = {name: hashlib.sha256(text.encode('utf-8')).hexdigest() for name, text in files.items()}
         files['.websmith/installed-files.json'] = json.dumps(inventory, indent=2) + '\n'
         install_files(root, files)
-    except (ValueError, OSError, EOFError, KeyboardInterrupt) as exc:
+    except (ValueError, OSError, zipfile.BadZipFile, EOFError, KeyboardInterrupt) as exc:
         print(f'Inizializzazione interrotta: {exc}')
         return 2
     print(f'Websmith inizializzato in {root}. Agente: {agent}.')

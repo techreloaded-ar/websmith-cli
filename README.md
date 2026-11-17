@@ -95,7 +95,7 @@ Apri `web/index.html` nel browser. Per cambiare il testo modifica
 Una cartella non vuota senza manifest viene rifiutata: nessuna migrazione implicita.
 Un sito con manifest valido riceve le istruzioni mancanti; istruzioni e guide già
 presenti restano invariate. I modelli di istruzioni sono file Markdown in
-`src/websmith/resources/rules/`, inclusi nel pacchetto: `init` li copia nella
+`src/websmith/resources/rules/`, scaricati da GitHub: `init` li copia nella
 radice del sito come `AGENTS.md`, `COMPOSITION_GUIDE.md`, `TONE_OF_VOICE.md` ed
 `EDITORIAL_RULES.md`. Le regole non sono incorporate nel codice Python.
 La composizione governa rendering, template e componenti; il tone of voice
@@ -140,7 +140,7 @@ Non viene eseguito alcun `git pull`, né modificato il repository del sito.
 
 Prima della sostituzione verifica SHA-256, avvio e versione dell'eseguibile;
 in caso di verifica fallita conserva o ripristina il binario precedente. Avvia
-poi il nuovo programma per aggiornare le regole del sito con i nuovi modelli.
+poi il nuovo programma per scaricare da GitHub le regole del sito.
 Se questa seconda fase fallisce, il nuovo programma resta installato e il comando
 segnala di correggere l'errore e ripetere update.
 
@@ -149,16 +149,24 @@ Per esecuzioni Python e per Windows, se è disponibile un binario più recente,
 il comando richiede l'installazione della release; non sostituisce un interprete
 Python o un eseguibile Windows in uso.
 
-`--dry-run` controlla la release senza scaricare eseguibili o scrivere file. Se è
-più recente, segnala che le regole saranno aggiornate dai modelli di quella release;
-non simula le differenze di modelli che non ha scaricato. Se il binario è già aggiornato,
-mostra il piano delle regole locali. Con `--offline` aggiorna solo le regole usando
-la versione già installata, senza accedere alla rete. Un errore di rete interrompe
-l'aggiornamento senza cambiare il sito; non viene ignorato automaticamente.
+Dalla versione `0.1.0a9` le istruzioni Markdown sono distribuite separatamente dal
+programma: non sono incluse negli eseguibili. `init` e `update` scaricano i file
+in `src/websmith/resources/` dal ramo `main` di GitHub, fissando tutti i download
+alla stessa revisione. Un push delle regole su `main` basta per renderle disponibili:
+non occorre cambiare versione o ricompilare il programma. Il controllo delle release
+per l'eseguibile resta separato e non lo sostituisce a parità di versione.
+
+`--dry-run` controlla la release e scarica le istruzioni per mostrare le differenze,
+senza sostituire l'eseguibile né scrivere nel sito o nella cache.
+Con `--offline`, disponibile anche per `init`, usa l'ultima copia esterna scaricata
+in `~/.cache/websmith/instructions/` (oppure sotto `XDG_CACHE_HOME`). Al primo uso
+serve una connessione; in sviluppo si possono usare i file del checkout.
+Un errore di rete interrompe l'aggiornamento senza cambiare il sito.
+La revisione delle istruzioni è registrata in `.websmith/project.json`.
 Fuori da un sito, `update` aggiorna soltanto il programma.
 
 Dalla versione `0.1.0a7` le tre guide sono basi gestite da Websmith: vengono
-aggiunte o sostituite con i modelli della versione installata, anche se erano
+aggiunte o sostituite con i modelli scaricati da GitHub, anche se erano
 state modificate direttamente. Le basi sostituite sono conservate per recupero
 in `.websmith/update-backups/VERSIONE/IMPRONTA/`; quelle copie non sono regole attive.
 

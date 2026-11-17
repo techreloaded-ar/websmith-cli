@@ -91,7 +91,7 @@ def write_plan(root: Path, writes: dict[str, bytes]) -> None:
 
 def command_update(args) -> int:
     from .engine import validate_site_manifest
-    from .self_update import update_program, version_key
+    from .self_update import update_program
 
     try:
         if args.site_root:
@@ -126,14 +126,14 @@ def command_update(args) -> int:
             result = update_program(args, root)
             if result is not None:
                 return result
-        instructions_version = marker.get('instructions_version')
-        if instructions_version and version_key(instructions_version) > version_key(__version__):
-            raise ValueError('Il sito contiene istruzioni di una versione più recente: nessuna regola sostituita.')
+        from .rule_source import load
+        resources, revision = load(offline=args.offline, persist=not args.dry_run)
+        print(f'Revisione istruzioni: {revision}')
 
         writes = {}
         messages = []
         proposals = []
-        for name, text in agent_files(marker['agent']).items():
+        for name, text in agent_files(marker['agent'], resources).items():
             desired = text.encode('utf-8')
             target = checked_path(root, name)
             current = target.read_bytes() if target.exists() else None
@@ -155,7 +155,7 @@ def command_update(args) -> int:
                 inventory[name] = digest(desired)
                 messages.append(f'{"Aggiunta" if current is None else "Aggiornamento"}: {name}')
             else:
-                proposal = f'.websmith/update-proposals/{__version__}/{name}'
+                proposal = f'.websmith/update-proposals/{revision}/{name}'
                 proposed_path = checked_path(root, proposal)
                 if proposed_path.exists():
                     if proposed_path.read_bytes() != desired:
@@ -171,6 +171,7 @@ def command_update(args) -> int:
             if local.exists() or local.is_symlink():
                 messages.append(f'Personalizzazioni locali conservate: {local.name}')
         marker['instructions_version'] = __version__
+        marker['instructions_revision'] = revision
         marker['instruction_overrides'] = 'optional-local-files'
         marker['pending_instruction_updates'] = proposals
         marker_bytes = (json.dumps(marker, indent=2) + '\n').encode('utf-8')

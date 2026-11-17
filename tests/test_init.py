@@ -9,6 +9,8 @@ import unittest
 
 class InitTests(unittest.TestCase):
     def cli(self, root, *args, input=None):
+        if args and args[0] == 'init':
+            args = (*args, '--offline')
         command = [os.environ['WEBSMITH_TEST_BINARY']] if os.environ.get('WEBSMITH_TEST_BINARY') else [sys.executable, '-m', 'websmith']
         return subprocess.run([*command, *args], cwd=root, input=input, text=True, capture_output=True)
 

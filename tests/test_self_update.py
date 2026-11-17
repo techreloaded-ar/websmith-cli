@@ -38,7 +38,7 @@ class SelfUpdateTests(unittest.TestCase):
 
     def test_dry_run_only_checks_release_metadata(self):
         with patch.object(updater, '__version__', '0.1.0a8'), patch.object(updater, 'latest_release', return_value=release()), patch.object(updater, 'platform_asset', return_value=('websmith-darwin-arm64.zip', 'websmith')), patch.object(updater, 'verified_binary') as fetch, patch.object(updater, 'install_binary') as install:
-            self.assertEqual(updater.update_program(SimpleNamespace(dry_run=True), Path('/site')), 0)
+            self.assertIsNone(updater.update_program(SimpleNamespace(dry_run=True), Path('/site')))
             fetch.assert_not_called()
             install.assert_not_called()
 
@@ -94,7 +94,7 @@ class SelfUpdateTests(unittest.TestCase):
             root = Path('/tmp/site with spaces')
             self.assertEqual(updater.update_program(SimpleNamespace(dry_run=False), root), 0)
             install.assert_called_once_with(Path('/tmp/websmith').resolve(), b'new', 'v0.1.0a9')
-            self.assertEqual(run.call_args.args[0], [str(Path('/tmp/websmith').resolve()), '--site-root', str(root), 'update', '--offline'])
+            self.assertEqual(run.call_args.args[0], [str(Path('/tmp/websmith').resolve()), '--site-root', str(root), 'update'])
             self.assertEqual(run.call_args.kwargs['env']['PYINSTALLER_RESET_ENVIRONMENT'], '1')
 
     def test_network_failure_does_not_touch_site(self):

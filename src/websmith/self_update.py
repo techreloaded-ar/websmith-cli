@@ -161,8 +161,8 @@ def update_program(args, root: Path | None) -> int | None:
         name, _ = platform_asset()
         release_asset_url(release, name)
         print('Anteprima: aggiornerei il programma alla nuova release, poi le regole del sito '
-              'con i suoi modelli. Nessun eseguibile scaricato o file modificato.', flush=True)
-        return 0
+              'da GitHub. Nessun eseguibile scaricato o file modificato.', flush=True)
+        return None
     if not getattr(sys, 'frozen', False):
         raise ValueError('Autoaggiornamento disponibile per l’eseguibile autonomo. '
                          'Questa esecuzione usa Python: installare una release autonoma o usare --offline per le regole locali.')
@@ -176,7 +176,7 @@ def update_program(args, root: Path | None) -> int | None:
     if root is None:
         print('Nessun sito selezionato: programma aggiornato. Eseguire update nella cartella del sito per le regole.')
         return 0
-    result = subprocess.run([str(target), '--site-root', str(root), 'update', '--offline'], env=child_env())
+    result = subprocess.run([str(target), '--site-root', str(root), 'update'], env=child_env())
     if result.returncode:
         print('Programma aggiornato; aggiornamento delle regole non completato. Correggere l’errore indicato e ripetere update.')
     return result.returncode

@@ -3711,12 +3711,13 @@ def build_parser() -> argparse.ArgumentParser:
     init_parser.add_argument("--url", help="URL del sito; predefinito https://example.test")
     init_parser.add_argument("--language", choices=["it", "en"], help="Lingua iniziale")
     init_parser.add_argument("--agent", choices=["codex", "claude", "none"], help="Agente da configurare")
+    init_parser.add_argument("--offline", action="store_true", help="Usa la copia esterna delle istruzioni già scaricata, senza rete")
     init_parser.set_defaults(func=command_init)
 
     from .update import command_update
     update_parser = subparsers.add_parser("update", help="Aggiorna Websmith da GitHub e le regole del sito, conservando i file locali")
     update_parser.add_argument("--dry-run", action="store_true", help="Mostra gli aggiornamenti senza modificare file")
-    update_parser.add_argument("--offline", action="store_true", help="Usa solo il programma e i modelli già installati, senza rete")
+    update_parser.add_argument("--offline", action="store_true", help="Usa la copia esterna delle istruzioni già scaricata, senza rete")
     update_parser.set_defaults(func=command_update)
 
     inspect_parser = subparsers.add_parser("inspect", help="Inspect site structure without writing files")
@@ -3889,7 +3890,16 @@ def build_parser() -> argparse.ArgumentParser:
         if args.topic:
             subparsers.choices[args.topic].print_help()
         else:
-            print(read_text(RESOURCE_ROOT / "docs" / "HELP.md"))
+            from .rule_source import load
+            try:
+                resources, _ = load(offline=True)
+            except (ValueError, OSError):
+                try:
+                    resources, _ = load()
+                except (ValueError, OSError) as exc:
+                    print(f"Documentazione non disponibile: {exc}. Usa websmith --help.")
+                    return 2
+            print(resources["docs/HELP.md"])
         return 0
 
     help_parser.set_defaults(func=show_help)
