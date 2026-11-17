@@ -3,6 +3,9 @@
 Programma deterministico per siti indipendenti. Il programma si installa sul
 computer; configurazione e sorgenti rimangono nella cartella di ciascun sito.
 
+Per una descrizione complessiva del sistema e delle modalità operative, leggere
+[Websmith — Funzionamento e flussi di lavoro](docs/WEBSMITH_FUNZIONAMENTO_E_FLUSSI_DI_LAVORO.md).
+
 ## Installazione da GitHub (macOS e Linux x64)
 
 Il repository è pubblico: installazione e aggiornamenti non richiedono login GitHub.
@@ -91,8 +94,19 @@ Apri `web/index.html` nel browser. Per cambiare il testo modifica
 `init` non sovrascrive file e ripeterlo su un sito inizializzato non lo modifica.
 Una cartella non vuota senza manifest viene rifiutata: nessuna migrazione implicita.
 Un sito con manifest valido riceve le istruzioni mancanti; istruzioni e guide già
-presenti restano invariate. Le regole comuni sono in `.websmith/rules.md`;
-i metadati e le impronte dei file installati sono in `.websmith/`.
+presenti restano invariate. I modelli di istruzioni sono file Markdown in
+`src/websmith/resources/rules/`, inclusi nel pacchetto: `init` li copia nella
+radice del sito come `AGENTS.md`, `COMPOSITION_GUIDE.md`, `TONE_OF_VOICE.md` ed
+`EDITORIAL_RULES.md`. Le regole non sono incorporate nel codice Python.
+La composizione governa rendering, template e componenti; il tone of voice
+raccoglie voce, pubblico e lessico; le regole editoriali governano la revisione.
+Le proposte TechReloaded nei modelli editoriali sono esempi da confermare,
+non preferenze predefinite. Le copie locali possono essere personalizzate.
+Nei nuovi siti `.websmith/rules.md` non viene più creato; eventuali file legacy
+restano inalterati. I siti già inizializzati non vengono migrati automaticamente;
+anche un precedente `EDITORIAL_GUIDE.md` viene conservato.
+
+I metadati e le impronte dei file installati sono in `.websmith/`.
 Websmith non attiva un agente né si collega a un abbonamento AI. La scelta
 Codex/Claude configura esclusivamente istruzioni locali nella cartella sito.
 L'utilizzatore accede separatamente al proprio strumento AI, apre la cartella
@@ -105,8 +119,8 @@ Le skill locali sono `.agents/skills/websmith-site/` per Codex e
 `.claude/skills/websmith-site/` per Claude. Il comando non installa gli agenti.
 L'aggiornamento delle istruzioni di un sito già inizializzato è un lavoro distinto.
 Il nuovo TechReloaded sarà creato solo nel percorso scelto dall'utente.
-La guida `websmith HELP` conserva gli esempi storici; per le opzioni attuali usare
-`websmith COMANDO --help`. I percorsi relativi di `resolve-page` e `parse-component`
+La guida `websmith HELP` descrive il flusso locale e distingue la compatibilità
+storica. Per tutte le opzioni usare `websmith COMANDO --help`. I percorsi relativi di `resolve-page` e `parse-component`
 restano riferiti alla cartella di esecuzione: usare percorsi assoluti.
 
 ## Sviluppo
@@ -122,8 +136,7 @@ python3.11 -m venv .venv
 .venv/bin/python scripts/package-native.py
 ```
 
-Le versioni delle librerie sono in `requirements.lock`; la provenienza dei file
-recuperati è in `PROVENANCE.json`. GitHub costruisce e verifica gli eseguibili
+Le versioni delle librerie sono in `requirements.lock`. GitHub costruisce e verifica gli eseguibili
 per quattro piattaforme prima della distribuzione. I pacchetti npm sono stati
 abbandonati prima di qualsiasi pubblicazione. L'installazione pipx dal tag GitHub
 rimane possibile per chi preferisce il pacchetto Python.

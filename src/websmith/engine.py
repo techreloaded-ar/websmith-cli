@@ -22,6 +22,8 @@ from functools import lru_cache
 from pathlib import Path
 from urllib.parse import urlparse
 
+from . import __version__
+
 try:
     import yaml
 except ImportError:  # pragma: no cover - reported at runtime by validation command.
@@ -3676,7 +3678,7 @@ def command_parse_component(args: argparse.Namespace) -> int:
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(description="Websmith deterministic site tooling")
     parser.add_argument("--site-root", type=Path, help="Independent site directory (before command)")
-    parser.add_argument("--version", action="version", version="websmith 0.1.0a4")
+    parser.add_argument("--version", action="version", version=f"websmith {__version__}")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
     from .import_web import command_import

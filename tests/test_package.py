@@ -48,7 +48,10 @@ class PackageTests(unittest.TestCase):
 
     def test_installed_resources_and_help(self):
         self.assertTrue(engine.SITE_SCHEMA_PATH.is_file())
-        self.assert_ok(self.run_cli('--version'))
+        from websmith import __version__
+        version_result = self.run_cli('--version')
+        self.assert_ok(version_result)
+        self.assertEqual(version_result.stdout.strip(), f'websmith {__version__}')
         self.assert_ok(self.run_cli('HELP'))
 
     def test_external_site_and_repeatable_render(self):

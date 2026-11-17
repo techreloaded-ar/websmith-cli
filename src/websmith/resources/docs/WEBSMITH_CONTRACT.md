@@ -26,11 +26,11 @@ Shared rules apply to every migrated site:
 - validation precedes rendering;
 - rendered links and local assets are verified.
 
-These rules belong in `AGENTS.md`, shared documentation, and shared renderer tests.
+Operational technical rules belong in `COMPOSITION_GUIDE.md`; `AGENTS.md` points to the relevant guides. This document explains the engine contract, and renderer tests verify its implementation.
 
 ### Site-specific rules
 
-Site-specific rules apply only inside one `websites/<site>/` tree:
+Site-specific rules apply only inside one independent site directory:
 
 - canonical and supported languages;
 - content group names and routes;
@@ -62,13 +62,16 @@ These rules belong in the site's composition guide, component catalog, templates
 
 ## Expected Site Package
 
-The target structure is:
+The recommended structure below is rooted in the independent site directory. Actual paths come from its manifest; documentation files describe agent operations and are not all prerequisites enforced by the renderer:
 
 ```text
-websites/<site>/
+<site-root>/
   websmith.yaml
+  AGENTS.md
+  .websmith/                 (initialization metadata, when initialized)
   COMPOSITION_GUIDE.md
-  EDITORIAL_GUIDE.md         (optional, site-owned editorial policy)
+  TONE_OF_VOICE.md           (site voice, audience, vocabulary)
+  EDITORIAL_RULES.md         (editing rules and editorial formats)
   contents/
     <language>/
       **/*.md
@@ -84,29 +87,43 @@ websites/<site>/
   web/
 ```
 
-Every migrated site has a `websites/<site>/websmith.yaml` manifest validated against `schemas/websmith-site.schema.json`. The manifest makes paths, languages, defaults, routes, brand metadata, and asset policies machine-readable. Run:
+Every migrated site has a `websmith.yaml` manifest at its root, validated against the schema bundled at `resources/schemas/websmith-site.schema.json` in the installed package. The manifest makes paths, languages, defaults, routes, brand metadata, and asset policies machine-readable. Run:
 
 ```bash
-PYTHONPYCACHEPREFIX=/tmp python3 scripts/websmith.py validate-site <site>
+websmith --site-root /path/to/site validate-site
 ```
 
 The manifest declares operational data used by the renderer. It does not contain visual values, editorial copy, component definitions, secrets, or deployment credentials.
 
-The shared page-resolution, validation, and publishing functions read canonical language, supported languages, source roots, output roots, page directories, required front matter fields, template and CSS paths, asset copy and resolution rules, logo, brand metadata, and root redirect settings from this manifest. Site-specific template bindings are declared in site-owned HTML with `data-websmith-*` attributes.
+The shared page-resolution, validation, and rendering functions read canonical language, supported languages, source roots, output roots, page directories, required front matter fields, template and CSS paths, asset copy and resolution rules, logo, brand metadata, and root redirect settings from this manifest. Site-specific template bindings are declared in site-owned HTML with `data-websmith-*` attributes.
 
 The root redirect is generated per site with:
 
 ```bash
-PYTHONPYCACHEPREFIX=/tmp python3 scripts/websmith.py render-root-index --site <site>
+websmith --site-root /path/to/site render-root-index
 ```
 
 Its destinations, alternates, labels, canonical URL, title, and description come from the selected manifest. Its visual structure remains site-owned in the root template declared by `root_redirect.template`.
 
-Sites that do not yet match this structure are legacy or incomplete sites. Shared tools must report that state accurately; they must not describe a missing content tree as aligned or infer another site's conventions.
+Sites with different manifest-declared paths are supported. Missing required source resources, rather than a different directory name, indicate an incomplete site. Legacy sources may require explicit migration. Shared tools must report that state accurately; they must not describe a missing content tree as aligned or infer another site's conventions.
+
+## Site selection and historical compatibility
+
+The primary workflow uses `websmith` from an independent site directory or its
+subdirectories. `--site-root /path/to/site`, placed before the command, selects
+an explicit site. Schema and documentation resources belong to the installed
+program; they are not resolved through the old project's checkout.
+
+Named site selectors and TechReloaded shortcuts remain for compatibility with
+the historical `websites/<site>/` layout. They are not requirements for new sites
+and do not define a global default site. Some inspection commands still require
+a positional site selector; an absolute site-directory path can be used there.
+For `resolve-page` and `parse-component`, relative file arguments remain relative
+to the working directory; prefer absolute paths.
 
 ## Composition Guide Contract
 
-Every migrated site must provide `websites/<site>/COMPOSITION_GUIDE.md`. It should document:
+For agent work, a migrated site should provide `COMPOSITION_GUIDE.md` or the composition guide path declared in its manifest. It should document:
 
 - canonical source language and translation workflow;
 - actual source, template, CSS, asset, and output paths;
@@ -119,18 +136,31 @@ Every migrated site must provide `websites/<site>/COMPOSITION_GUIDE.md`. It shou
 
 It should explain where and how to make a change. It must not duplicate exact visual values already owned by CSS.
 
-## Optional Editorial Guide
+## Agent instruction files
 
-A site may provide `websites/<site>/EDITORIAL_GUIDE.md` for its audience, voice, writing guidance, content formats, and editorial publication workflow. Agents consult it when writing or revising content. On request, an agent interviews the editor and produces or updates the guide from the answers, following `AGENTS.md`.
+The package owns Markdown originals in `resources/rules/`. Initialization copies
+`AGENTS.md`, `COMPOSITION_GUIDE.md`, `TONE_OF_VOICE.md`, and `EDITORIAL_RULES.md`
+into the site root, preserving existing files. Instruction text is not embedded
+in initialization code. Codex and Claude entry points refer to `AGENTS.md`.
 
-This is site-owned editorial knowledge, not renderer configuration or a requirement for site conformance. Technical composition remains in the composition guide and component catalog; remote deployment remains governed by the shared Git workflow.
+`COMPOSITION_GUIDE.md` governs rendering, templates, components, source ownership,
+translations, validation, and output verification. `TONE_OF_VOICE.md` governs
+voice, audience, register, and vocabulary. `EDITORIAL_RULES.md` governs revision
+of existing text, source fidelity, quotations, numbers, cuts, and editorial notes.
+The two editorial templates derive only from `linee-guida-agente-editor.md`;
+TechReloaded proposals remain explicitly unconfirmed examples.
+
+Editorial notes must not enter publishable source bodies or bound editorial
+fields. Instruction files do not authorize remote publication. Already
+initialized sites are not automatically migrated; legacy `EDITORIAL_GUIDE.md`
+and `.websmith/rules.md` files are preserved.
 
 ## Component Catalog Contract
 
 Every migrated site with component directives must provide its own catalog, normally at:
 
 ```text
-websites/<site>/templates/html/components/catalog.yaml
+<site-root>/templates/html/components/catalog.yaml
 ```
 
 The catalog is the site's semantic design-system vocabulary. At minimum, each component should declare:
@@ -264,7 +294,7 @@ For each site migration:
 5. document intentional differences;
 6. only then remove superseded site hardcoding.
 
-TechReloaded is the current reference implementation. It is evidence for the shared contract, not the definition of all future sites.
+TechReloaded provided the historical reference implementation. Its legacy shortcuts remain compatibility features, not the definition of independent sites.
 
 ## Definition Of A Conforming Site
 

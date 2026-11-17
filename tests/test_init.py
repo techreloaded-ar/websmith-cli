@@ -23,6 +23,11 @@ class InitTests(unittest.TestCase):
             root = Path(directory)
             self.ok(self.cli(root, 'init', '--yes', '--name', 'Caffè & Studio', '--agent', 'codex'))
             self.assertTrue((root / '.agents/skills/websmith-site/SKILL.md').is_file())
+            from websmith.initialize import RULES_ROOT
+            for name in ('AGENTS.md', 'COMPOSITION_GUIDE.md', 'TONE_OF_VOICE.md', 'EDITORIAL_RULES.md'):
+                self.assertEqual((root / name).read_bytes(), (RULES_ROOT / name).read_bytes())
+            self.assertFalse((root / '.websmith/rules.md').exists())
+            (root / 'TONE_OF_VOICE.md').write_text('La voce personalizzata del sito.')
             self.ok(self.cli(root, 'validate-site'))
             self.ok(self.cli(root, 'validate-pages'))
             source = root / 'contents/it/pages/home.md'
@@ -55,6 +60,11 @@ class InitTests(unittest.TestCase):
             root = Path(directory)
             make_site(root)
             (root / 'AGENTS.md').write_text('Existing instructions')
+            (root / 'TONE_OF_VOICE.md').write_text('Existing voice')
+            (root / 'EDITORIAL_RULES.md').write_text('Existing editorial rules')
+            (root / 'EDITORIAL_GUIDE.md').write_text('Legacy editorial guide')
+            (root / '.websmith').mkdir()
+            (root / '.websmith/rules.md').write_text('Legacy local rules')
             before = self.snapshot(root)
             self.ok(self.cli(root, 'init', '--yes', '--agent', 'claude'))
             for name, content in before.items():
@@ -77,11 +87,11 @@ class InitTests(unittest.TestCase):
             root = Path(directory)
             make_site(root)
             (root / '.websmith').mkdir()
-            (root / '.websmith/rules.md').write_text('Local changes')
+            (root / '.websmith/installed-files.json').write_text('Local inventory')
             before = self.snapshot(root)
             self.assertNotEqual(self.cli(root, 'init', '--yes').returncode, 0)
             self.assertEqual(before, self.snapshot(root))
-            (root / '.websmith/rules.md').unlink()
+            (root / '.websmith/installed-files.json').unlink()
             (root / 'websmith.yaml').write_text('bad: manifest')
             before = self.snapshot(root)
             self.assertNotEqual(self.cli(root, 'init', '--yes').returncode, 0)

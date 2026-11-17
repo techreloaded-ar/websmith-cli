@@ -14,34 +14,11 @@ import yaml
 
 from . import __version__
 
-RULES = '''# Regole comuni Websmith
+RULES_ROOT = Path(__file__).resolve().parent / 'resources' / 'rules'
 
-Il motore valida e genera HTML in modo deterministico; non inventa contenuti o
-traduzioni. I sorgenti autorevoli sono Markdown, template, componenti, CSS e media.
-Le modifiche durature vanno riportate in questi sorgenti, non solo in web/.
-Leggere il manifest e COMPOSITION_GUIDE.md prima di cambiare la composizione;
-leggere EDITORIAL_GUIDE.md quando presente per il lavoro editoriale.
-I componenti appartengono al sito: consultare il catalogo dichiarato nel manifest.
-Non importare decisioni visuali o editoriali da altri siti nel renderer comune.
-Aggiornare le traduzioni esistenti previste dal sito e preservarne la struttura.
-Validare manifest e pagine prima di generare; verificare HTML, link e immagini.
-I valori editoriali devono avere una destinazione dichiarata nei template;
-i contenuti di anteprima non devono sopravvivere quando il sorgente manca.
-La pubblicazione remota è distinta dall'inizializzazione e dalla generazione.
-'''
 
-SKILL = '''---
-name: websmith-site
-description: Modifica i sorgenti di questo sito Websmith, valida le pagine e genera HTML secondo le guide locali.
----
-
-Dalla radice del sito leggere AGENTS.md e .websmith/rules.md, poi il manifest
-websmith.yaml e la guida di composizione indicata. Consultare il catalogo prima
-di modificare componenti e la guida editoriale, quando presente, per i testi.
-Risolvere una richiesta su HTML nei suoi sorgenti autorevoli. Dopo la modifica,
-eseguire i controlli e i comandi di generazione documentati dal sito e ispezionare
-il risultato. Non creare contenuti o traduzioni per risolvere ambiguità tecniche.
-'''
+def rule_text(name: str) -> str:
+    return (RULES_ROOT / name).read_text(encoding='utf-8')
 
 
 def slug(value: str) -> str:
@@ -54,19 +31,14 @@ def ask(label: str, default: str) -> str:
 
 
 def agent_files(agent: str) -> dict[str, str]:
-    files = {'.websmith/rules.md': RULES}
-    files['AGENTS.md'] = '''# Istruzioni per questo sito
-
-Leggere .websmith/rules.md, websmith.yaml e COMPOSITION_GUIDE.md.
-Per i testi consultare EDITORIAL_GUIDE.md quando presente.
-Le istruzioni comuni sono in .websmith/rules.md; le guide del sito ne specificano
-contenuti, composizione e comandi senza duplicare le regole comuni.
-'''
+    files = {name: rule_text(name) for name in (
+        'AGENTS.md', 'COMPOSITION_GUIDE.md', 'TONE_OF_VOICE.md', 'EDITORIAL_RULES.md',
+    )}
     if agent == 'codex':
-        files['.agents/skills/websmith-site/SKILL.md'] = SKILL
+        files['.agents/skills/websmith-site/SKILL.md'] = rule_text('WEBSMITH_SITE_SKILL.md')
     elif agent == 'claude':
-        files['CLAUDE.md'] = 'Leggere e applicare AGENTS.md nella radice di questo sito.\n'
-        files['.claude/skills/websmith-site/SKILL.md'] = SKILL
+        files['CLAUDE.md'] = rule_text('CLAUDE.md')
+        files['.claude/skills/websmith-site/SKILL.md'] = rule_text('WEBSMITH_SITE_SKILL.md')
     return files
 
 
@@ -121,30 +93,7 @@ def starter(name: str, site_id: str, url: str, language: str) -> dict[str, str]:
         'templates/images/logo.svg': '<svg xmlns="http://www.w3.org/2000/svg" width="64" height="64" viewBox="0 0 64 64"><rect width="64" height="64" rx="12" fill="#334155"/></svg>\n',
         'media/.gitkeep': '',
         'web/.gitkeep': '',
-        'COMPOSITION_GUIDE.md': f'''# Composizione del sito
 
-La lingua iniziale è `{language}`. La homepage è `contents/{language}/pages/home.md`.
-Modificare i testi nel Markdown e la struttura in `templates/html/page.html`.
-La composizione di esempio è volutamente minima: prima della pubblicazione
-sostituire testi, logo, dominio ed email di esempio nel manifest.
-Il CSS è in `templates/CSS/main.css`; i media del sito sono in `media/`.
-Il catalogo è `templates/html/components/catalog.yaml`; il componente note
-espone il campo body. Non esistono componenti globali impliciti.
-
-```bash
-websmith validate-site
-websmith validate-pages
-websmith render-page home
-websmith render-root-index
-```
-
-L'output della homepage è `web/{language}/index.html`; `web/index.html` reindirizza
-alla lingua iniziale. Dopo la generazione ispezionare HTML, link e immagini.
-Aprire `web/index.html` nel browser per l'anteprima. `web/` è generata e non è
-il luogo per modifiche durature. Non sono configurati FTP o pubblicazione remota.
-Aggiungere una lingua richiede dichiararla nel manifest e scriverne i Markdown;
-il programma non traduce i contenuti. EDITORIAL_GUIDE.md è facoltativa.
-''',
     }
 
 
@@ -225,7 +174,7 @@ def command_init(args) -> int:
         files = agent_files(agent)
         if existing:
             # An existing entry point belongs to the site; provide instructions without editing it.
-            files = {name: text for name, text in files.items() if not (root / name).exists() or name == '.websmith/rules.md'}
+            files = {name: text for name, text in files.items() if not (root / name).exists() and not (root / name).is_symlink()}
         else:
             name = args.name or (ask('Nome del sito', root.name) if interactive else root.name)
             site_id = args.id or (ask('Identificativo del sito', slug(name)) if interactive else slug(name))
@@ -255,7 +204,7 @@ def command_init(args) -> int:
         return 2
     print(f'Websmith inizializzato in {root}. Agente: {agent}.')
     if existing:
-        print('Sorgenti e istruzioni preesistenti preservati. Leggere .websmith/rules.md e la guida del sito.')
+        print('Sorgenti e istruzioni preesistenti preservati. Leggere AGENTS.md e le guide del sito.')
     else:
         print('Pagina di esempio creata. Personalizzala, poi esegui:\n  websmith validate-site\n  websmith validate-pages\n  websmith render-page home\n  websmith render-root-index\nApri web/index.html nel browser.')
     return 0

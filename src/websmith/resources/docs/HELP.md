@@ -1,127 +1,175 @@
-# Acquisizione browser manuale (dalla versione 0.1.0a4)
-
-`websmith import URL --browser` apre Chrome in una sessione dedicata.
-Scorrere e controllare la pagina; tornare al terminale e premere Invio per salvarla.
-Poi indicare il prossimo URL o Invio per terminare. `--single-page` salva una pagina.
-La copia è in imports/NOME-DOMINIO-browser/ con originals/, rendered/,
-screenshots/, preview/ e REPORT.md. Vengono salvate le risorse caricate dal browser.
-Nessun download supplementare delle risorse bloccate, nessun profilo esportato.
-Per una nuova sessione scegliere --output; niente sovrascritture.
-La modalità browser richiede un terminale interattivo e un browser installato.
-`websmith browser-install` installa Chromium; usare poi --browser-channel chromium.
-Il comando non converte in Markdown; l'agente lavora successivamente sulla copia.
-
-# Importazione web (dalla versione 0.1.0a3)
-
-`websmith import URL` acquisisce pagine HTML pubbliche e risorse in
-imports/NOME-DOMINIO, senza modificare sorgenti o configurazione del sito.
-Leggere REPORT.md prima della conversione assistita dall'agente.
-Opzioni: `--output`, `--max-pages`, `--max-depth`, `--max-assets`,
-`--max-file-bytes`, `--max-total-bytes`, `--timeout`, `--delay`.
-Il download rispetta robots.txt. Non esegue JavaScript o script del sito.
-Una destinazione esistente non viene sovrascritta; usare --output per una nuova prova.
-Un sito già sviluppato con Websmith si copia manualmente e si controlla con init
-/ validate-site / validate-pages: non serve import folder.
-
-# Inizializzazione locale (dalla versione 0.1.0a2)
-
-`websmith init` inizializza la cartella corrente con domande guidate. Richiede una
-cartella vuota oppure un sito con websmith.yaml valido. Non sovrascrive file.
-`websmith init --yes --name "Il mio sito" --agent codex` usa valori espliciti e
-predefiniti senza domande. Agenti: codex, claude, none. Lingue iniziali: it, en.
-Per tutte le opzioni: `websmith init --help`.
-Dopo init: `websmith validate-site`, `websmith validate-pages`,
-`websmith render-page home`, `websmith render-root-index`. Aprire web/index.html.
-FTP e pubblicazione non fanno parte dell'inizializzazione.
-
-La guida seguente documenta anche la precedente struttura del progetto.
-
 # HELP — Comandi Websmith
 
-In chat scrivi `HELP` per l'elenco oppure `HELP render-page` per un comando specifico.
-Dal terminale, nella cartella principale del repository:
+Usare `websmith HELP` (oppure `websmith help`) per questa guida e
+`websmith HELP render-page` per le opzioni correnti di un comando.
+Anche `websmith render-page --help` mostra le opzioni senza modificare file.
+In chat, una richiesta HELP serve a spiegare i comandi, non a eseguirli.
+
+## Selezionare il sito
+
+Il percorso ordinario parte dalla cartella del sito con `websmith.yaml` o da una
+sua sottocartella. Non serve collocare il sito nel repository del programma.
+Per sceglierlo da un'altra posizione mettere l'opzione globale prima del comando:
 
 ```bash
-python3 scripts/websmith.py HELP
-python3 scripts/websmith.py HELP render-page
+websmith --site-root /percorso/del/sito validate-site
+websmith --site-root /percorso/del/sito render-page home
 ```
 
-È disponibile anche `help` minuscolo. `HELP` mostra questa guida senza modificare
-file; `HELP <comando>` mostra la sintassi e tutte le opzioni correnti della CLI.
-Puoi ottenere le stesse opzioni con `python3 scripts/websmith.py <comando> --help`.
+`page_id` è l'identificativo canonico del front matter, non il nome dell'HTML.
+Lingue, percorsi e componenti dipendono dal manifest e dal catalogo del sito.
+Leggere `AGENTS.md` e la guida di composizione indicata dal manifest.
 
-## Come leggere gli esempi
-
-Ogni riga sotto va preceduta da `python3 scripts/websmith.py `.
-Gli esempi usano TechReloaded: sostituisci sito, lingua e pagina con quelli
-del tuo sito, consultando `websites/<sito>/COMPOSITION_GUIDE.md`.
-I siti possono essere in fasi di migrazione diverse: la presenza nella CLI
-non garantisce che abbiano tutti i sorgenti e i contratti necessari.
-
-`page_id` è l'identificativo canonico nel front matter Markdown, non il nome
-del file HTML. Nei comandi con `--site`, il valore predefinito è `techreloaded`:
-specifica sempre il sito quando lavori altrove.
-
-## Esplorazione e verifica
-
-Questi comandi leggono i file senza rigenerare il sito.
-
-| Comando | A cosa serve | Esempio d'uso |
-| --- | --- | --- |
-| `HELP [comando]` | Mostra questa guida o le opzioni di un comando. | `HELP render-page` |
-| `inspect <sito>` | Esamina la struttura del sito. | `inspect techreloaded` |
-| `validate-site <sito>` | Valida il manifest `websmith.yaml` e le risorse locali dichiarate. | `validate-site techreloaded` |
-| `validate-frontmatter <sito>` | Controlla il front matter YAML dei sorgenti Markdown. | `validate-frontmatter techreloaded` |
-| `validate-page <sito> <lingua> <pagina>` | Valida il contratto di una pagina prima del rendering. | `validate-page techreloaded ita prodotti/archetipo` |
-| `validate-pages <sito> [--lang <lingua>]` | Valida le pagine del sito; senza `--lang` controlla tutte le lingue. | `validate-pages techreloaded --lang ita` |
-| `resolve-page <sito> <output>` | Risale dall'HTML al Markdown canonico e indica il comando di rendering. Usa un percorso assoluto o relativo alla radice del repository. | `resolve-page techreloaded websites/techreloaded/web/ita/prodotti/archetipo/index.html` |
-| `sync-translations <page_id> [--site <sito>]` | Controlla struttura e tracciabilità delle traduzioni esistenti. Non traduce e non crea file mancanti. | `sync-translations archetipo --site techreloaded` |
-| `parse-component <sito> <file> <componente>` | Analizza i blocchi di un componente nel Markdown senza generare HTML. | `parse-component techreloaded websites/techreloaded/contents/ita/prodotti/archetipo.md highlights-box-sx` |
-
-## Generazione e famiglie di pagine
-
-Questi comandi possono scrivere HTML, CSS e asset nell'output del sito.
-Il rendering valida prima i sorgenti e si ferma in caso di violazioni del contratto.
-
-| Comando | A cosa serve | Esempio d'uso |
-| --- | --- | --- |
-| `render-page <page_id> [--site <sito>] [--lang <lingua>] [--all-langs]` | Genera una pagina nell'output configurato. Senza opzioni di lingua usa quella canonica; `--all-langs` genera tutte le lingue configurate con un sorgente esistente. | `render-page archetipo --site techreloaded --all-langs` |
-| `render-root-index [--site <sito>]` | Genera il reindirizzamento iniziale alle lingue, secondo il manifest del sito. | `render-root-index --site techreloaded` |
-| `validate-family <family_id> [--site <sito>] [--no-render]` | Controlla una famiglia multilingue individuata dal prefisso dell'ID canonico e ne rigenera le pagine. Con `--no-render` valida i sorgenti e ispeziona l'HTML esistente senza rigenerarlo. | `validate-family archetipo --site techreloaded --no-render` |
-
-Per una sola lingua usa, per esempio, `render-page archetipo --site techreloaded --lang ita`.
-Scegli `--lang` oppure `--all-langs` secondo l'obiettivo.
-
-## Scorciatoie di compatibilità TechReloaded
-
-Questi comandi sono specifici di TechReloaded e scrivono l'output generato.
-Accettano `--lang`, con valore predefinito `ita`; usa solo lingue con sorgenti disponibili.
-Per gli altri siti usa `render-page` con l'ID della pagina e `--site`.
-
-| Comando | A cosa serve | Esempio d'uso |
-| --- | --- | --- |
-| `render-index` | Genera la homepage. | `render-index --lang ita` |
-| `render-archetipo` | Genera la pagina del prodotto Archetipo. | `render-archetipo --lang ita` |
-| `render-archetipo-beta` | Genera la pagina beta di Archetipo. | `render-archetipo-beta --lang ita` |
-| `render-documentazione` | Genera la documentazione di Archetipo. | `render-documentazione --lang ita` |
-| `render-team` | Genera l'indice del team. | `render-team --lang ita` |
-| `render-team-pages` | Genera le schede delle persone; `--slug` limita l'operazione a una persona. | `render-team-pages --lang ita --slug giovanni-puliti` |
-
-## Flusso tipico dopo una modifica editoriale
-
-1. Modifica il Markdown canonico e aggiorna le traduzioni esistenti previste dal sito.
-2. Controlla manifest, front matter, pagina e struttura delle traduzioni.
-3. Rigenera le lingue interessate e verifica HTML, link e asset.
-
-Esempio per Archetipo:
+## Creare un sito e preparare le istruzioni
 
 ```bash
-python3 scripts/websmith.py validate-site techreloaded
-python3 scripts/websmith.py validate-frontmatter techreloaded
-python3 scripts/websmith.py validate-pages techreloaded
-python3 scripts/websmith.py sync-translations archetipo --site techreloaded
-python3 scripts/websmith.py render-page archetipo --site techreloaded --all-langs
+websmith init
+websmith init --yes --name "Il mio sito" --agent codex
 ```
 
-Questi comandi operano localmente. La pubblicazione remota è gestita dal flusso Git
-del progetto, esterno a questa CLI.
+`init` richiede una cartella vuota oppure un sito con manifest valido; non
+sovrascrive file. Agenti: `codex`, `claude`, `none`. Lingue iniziali: `it`, `en`.
+Le opzioni complete sono in `websmith init --help`.
+
+I modelli Markdown esterni sono copiati nella radice del sito come `AGENTS.md`,
+`COMPOSITION_GUIDE.md`, `TONE_OF_VOICE.md` ed `EDITORIAL_RULES.md`. Le istruzioni
+specifiche Codex/Claude rimandano ad `AGENTS.md`. Websmith non installa o avvia
+l'agente, non collega un abbonamento AI e non pubblica il sito.
+
+Le guide esistenti sono preservate. Un sito già inizializzato non viene migrato
+automaticamente: i vecchi `.websmith/rules.md` ed `EDITORIAL_GUIDE.md` possono
+restare presenti, ma nei nuovi siti non vengono creati.
+
+## Ispezione e validazione
+
+Nelle righe con `SITO` obbligatorio usare il percorso assoluto della cartella del
+sito. È una differenza ancora presente nella sintassi dei comandi: non omettere
+quel parametro e non sostituirlo con `--site-root` da solo.
+
+| Comando | Scopo | Esempio |
+| --- | --- | --- |
+| `inspect [SITO]` | Esamina la struttura senza scrivere output. | `websmith inspect` |
+| `validate-site [SITO]` | Controlla manifest e risorse dichiarate. | `websmith validate-site` |
+| `validate-frontmatter [SITO]` | Controlla il front matter YAML. | `websmith validate-frontmatter` |
+| `validate-pages [SITO] [--lang LINGUA]` | Valida le pagine; per impostazione predefinita tutte le lingue. | `websmith validate-pages` |
+| `validate-page SITO LINGUA PAGINA` | Valida una pagina. | `websmith validate-page /percorso/del/sito it pages/home` |
+| `resolve-page SITO OUTPUT` | Risale dall'HTML al Markdown canonico. | `websmith resolve-page /percorso/del/sito /percorso/del/sito/web/it/index.html` |
+| `parse-component SITO FILE COMPONENTE` | Analizza i blocchi di un componente. | `websmith parse-component /percorso/del/sito /percorso/del/sito/contents/it/pages/home.md note` |
+| `sync-translations PAGE_ID [--site SITO]` | Controlla struttura e tracciabilità delle traduzioni; non traduce e non sincronizza Git. | `websmith sync-translations home` |
+
+Gli esempi `it`, `home` e `note` si riferiscono al sito iniziale; sostituirli con
+valori esistenti nel proprio sito. In `resolve-page` e `parse-component` i percorsi
+relativi dei file sono riferiti alla cartella di esecuzione: preferire gli assoluti.
+
+## Generazione
+
+Questi comandi possono scrivere HTML, CSS e asset. La generazione controlla i
+sorgenti e si ferma in caso di violazioni del contratto.
+
+| Comando | Scopo | Esempio |
+| --- | --- | --- |
+| `render-page PAGE_ID [--site SITO] [--lang LINGUA] [--all-langs]` | Genera la pagina; senza lingua usa quella canonica. | `websmith render-page home --all-langs` |
+| `render-root-index [--site SITO]` | Genera l'ingresso alle lingue secondo il manifest. | `websmith render-root-index` |
+| `validate-family FAMILY_ID [--site SITO] [--no-render]` | Controlla una famiglia multilingue individuata dal prefisso degli ID e ne rigenera le pagine. Con `--no-render` controlla i sorgenti e l'HTML esistente senza rigenerare. | `websmith validate-family prodotto --no-render` |
+
+Scegliere `--lang` oppure `--all-langs`. Le traduzioni devono essere già scritte
+nei sorgenti: `--all-langs` genera quelle esistenti senza tradurre.
+
+### Flusso tipico
+
+1. Modificare il Markdown canonico e aggiornare le traduzioni esistenti.
+2. Validare manifest, front matter, pagine e allineamento delle traduzioni.
+3. Generare le pagine e le lingue interessate e verificare HTML, link e asset.
+
+Per il sito minimo:
+
+```bash
+websmith validate-site
+websmith validate-frontmatter
+websmith validate-pages
+websmith sync-translations home
+websmith render-page home --all-langs
+websmith render-root-index
+```
+
+Aprire `web/index.html` nel browser. Modifiche durature nei sorgenti, non soltanto
+nell'HTML generato. Le note alla redazione non devono entrare nel contenuto pubblicabile.
+La pubblicazione remota è un passaggio separato, configurato per il singolo sito.
+
+## Importazione HTTP
+
+```bash
+websmith import https://www.esempio.it
+websmith import https://www.esempio.it --output imports/seconda-prova
+```
+
+Acquisisce HTML pubblico e risorse sotto `imports/NOME-DOMINIO/`, con `originals/`,
+`preview/`, `REPORT.md` e `report.json`. Leggere il rapporto prima della conversione.
+Rispetta robots.txt e non esegue JavaScript. Non converte in Markdown e non modifica
+i sorgenti del sito. Una destinazione esistente viene rifiutata.
+
+Opzioni: `--output`, `--max-pages`, `--max-depth`, `--max-assets`,
+`--max-file-bytes`, `--max-total-bytes`, `--timeout`, `--delay`.
+Un sito Websmith già disponibile si copia come progetto e si valida: non esiste
+un comando `import folder`. Per un progetto nuovo eseguire `init` prima dell'import.
+
+## Acquisizione browser manuale
+
+```bash
+websmith import https://www.esempio.it --browser
+```
+
+Apre Chrome in una sessione dedicata. Controllare e scorrere la pagina, poi tornare
+al terminale e premere Invio per salvarla. Indicare il prossimo URL dello stesso
+sito oppure Invio per terminare. `--single-page` salva soltanto la prima pagina.
+
+La copia è in `imports/NOME-DOMINIO-browser/`, con `originals/`, `rendered/`,
+`screenshots/`, `preview/`, `REPORT.md` e `report.json`. Salva le risorse caricate
+dal browser senza download supplementari delle risorse bloccate. Non esporta il
+profilo e non risolve automaticamente verifiche anti-bot. Per una nuova sessione
+scegliere un nuovo `--output`. La conversione resta un lavoro successivo dell'agente.
+
+Richiede un terminale interattivo e un browser installato. Per usare Chromium:
+
+```bash
+websmith browser-install
+websmith import https://www.esempio.it --browser --browser-channel chromium
+```
+
+`websmith browser-install --check` verifica il driver incluso senza installare
+Chromium. È disponibile anche `--browser-channel msedge` se Edge è installato.
+
+## Compatibilità con la struttura storica
+
+Il programma conserva selettori di sito per la struttura `websites/<nome>/` e
+scorciatoie specifiche TechReloaded. Non sono il modello richiesto ai nuovi siti.
+I nomi di sito e `--site NOME` risolvono la struttura storica, non una cartella
+locale arbitraria. Non combinare un nome storico con un `--site-root` diverso.
+L'assenza di un selettore nei comandi generici non sceglie automaticamente
+TechReloaded: occorre un sito locale individuabile o una selezione esplicita.
+
+Dalla radice di un progetto con struttura storica, per esempio:
+
+```bash
+websmith validate-site techreloaded
+websmith render-page archetipo --site techreloaded --all-langs
+```
+
+Le seguenti scorciatoie restano specifiche TechReloaded e possono scrivere output.
+Accettano `--lang`, con valore storico predefinito `ita`:
+
+| Comando | Scopo |
+| --- | --- |
+| `render-index` | Homepage TechReloaded. |
+| `render-archetipo` | Pagina Archetipo. |
+| `render-archetipo-beta` | Pagina beta Archetipo. |
+| `render-documentazione` | Documentazione Archetipo. |
+| `render-team` | Indice del team. |
+| `render-team-pages [--slug SLUG]` | Schede delle persone, eventualmente una sola. |
+
+Usarle soltanto se i sorgenti e i contratti del sito le supportano. Per i siti
+indipendenti usare i comandi generici e gli identificativi del proprio manifest.
+
+Per lo sviluppo nel repository, `python3 scripts/websmith.py` resta un lanciatore
+di compatibilità: richiede il pacchetto installato nell'ambiente Python scelto.
+Non è un requisito per chi usa l'eseguibile autonomo `websmith`.
