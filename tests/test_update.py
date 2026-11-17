@@ -11,6 +11,8 @@ from unittest.mock import patch
 
 class UpdateTests(unittest.TestCase):
     def cli(self, root, *args):
+        if args and args[0] == 'init':
+            args = (*args, '--offline')
         executable = [os.environ['WEBSMITH_TEST_BINARY']] if os.environ.get('WEBSMITH_TEST_BINARY') else [sys.executable, '-m', 'websmith']
         if args and args[0] == 'update':
             args = (*args, '--offline')
@@ -28,7 +30,7 @@ class UpdateTests(unittest.TestCase):
 
     def test_legacy_update_preserves_site_and_installs_missing_guides(self):
         from websmith import __version__
-        from websmith.initialize import RULES_ROOT
+        RULES_ROOT = Path(__file__).resolve().parents[1] / 'src/websmith/resources/rules'
         with tempfile.TemporaryDirectory(prefix='update sito con spazi ') as directory:
             root = Path(directory)
             self.init(root)
@@ -60,7 +62,8 @@ class UpdateTests(unittest.TestCase):
             self.assertEqual(before, self.snapshot(root))
 
     def test_bases_are_refreshed_and_optional_local_files_are_preserved(self):
-        from websmith.initialize import BASE_GUIDES, RULES_ROOT
+        from websmith.initialize import BASE_GUIDES
+        RULES_ROOT = Path(__file__).resolve().parents[1] / 'src/websmith/resources/rules'
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             self.init(root)
@@ -94,6 +97,7 @@ class UpdateTests(unittest.TestCase):
 
     def test_no_local_files_are_required_or_created(self):
         from websmith.initialize import BASE_GUIDES
+        RULES_ROOT = Path(__file__).resolve().parents[1] / 'src/websmith/resources/rules'
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
             self.init(root)
@@ -111,7 +115,7 @@ class UpdateTests(unittest.TestCase):
             output = self.ok(self.cli(root, 'update'))
             self.assertIn('Integrazione manuale necessaria', output)
             self.assertEqual((root / 'AGENTS.md').read_text(), 'Le mie istruzioni')
-            proposal = root / f'.websmith/update-proposals/{__version__}/AGENTS.md'
+            proposal = next((root / '.websmith/update-proposals').glob('*/AGENTS.md'))
             self.assertTrue(proposal.is_file())
             before = self.snapshot(root)
             self.ok(self.cli(root, 'update'))

@@ -2,7 +2,7 @@ name: Build standalone engines
 on:
   workflow_dispatch:
   push:
-    paths: ['src/**', 'setup.sh', 'scripts/build-native.py', 'scripts/package-native.py', '.github/workflows/native.yml']
+    paths: ['src/**', '!src/websmith/resources/**/*.md', 'pyproject.toml', 'setup.sh', 'scripts/build-native.py', 'scripts/package-native.py', '.github/workflows/native.yml']
 permissions:
   contents: read
 jobs:
@@ -32,6 +32,7 @@ jobs:
       - run: python scripts/build-native.py
       - run: python -m unittest discover -s tests -v
         env:
+          WEBSMITH_RESOURCE_DIR: ${{ github.workspace }}/src/websmith/resources
           WEBSMITH_BROWSER_TEST: ${{ runner.os == 'Linux' && '1' || '' }}
           WEBSMITH_BROWSER_CHANNEL: chrome
           WEBSMITH_TEST_BINARY: ${{ github.workspace }}/dist/native/websmith${{ matrix.target == 'win32-x64' && '.exe' || '' }}

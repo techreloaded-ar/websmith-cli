@@ -1,6 +1,6 @@
 # Websmith — Funzionamento e flussi di lavoro
 
-Aggiornato al 17 novembre 2026. Riferimento: codice di websmith-cli 0.1.0a8, con la nuova gestione delle istruzioni. La presenza nel repository non implica che queste modifiche siano già disponibili nell'eseguibile scaricabile da GitHub.
+Aggiornato al 17 novembre 2026. Riferimento: codice di websmith-cli 0.1.0a9, con la nuova gestione delle istruzioni. La presenza nel repository non implica che queste modifiche siano già disponibili nell'eseguibile scaricabile da GitHub.
 
 Questo documento descrive il funzionamento e le modalità operative di Websmith. Sostituisce la proposta di distribuzione del 21 ottobre 2026. Le funzionalità disponibili sono distinte dagli sviluppi ancora da realizzare.
 
@@ -139,7 +139,7 @@ Dati editoriali senza destinazione dichiarata, riferimenti irrisolti o input amb
 
 ## 4. I tre file di regole
 
-I modelli originali si trovano in `src/websmith/resources/rules/` e sono inclusi nel pacchetto del programma. Durante `init` vengono copiati nella radice del sito. Non sono testi incorporati in `initialize.py`: il codice legge i file e gestisce l'installazione.
+I modelli originali si trovano in `src/websmith/resources/rules/` e sono distribuiti separatamente dal programma. Durante `init` vengono copiati nella radice del sito. Non sono testi incorporati in `initialize.py`: il codice legge i file e gestisce l'installazione.
 
 | Documento | Ambito |
 | --- | --- |
@@ -173,7 +173,7 @@ Non viene eseguito alcun `git pull`, né modificato il repository del sito.
 
 Prima della sostituzione verifica SHA-256, avvio e versione dell'eseguibile;
 in caso di verifica fallita conserva o ripristina il binario precedente. Avvia
-poi il nuovo programma per aggiornare le regole del sito con i nuovi modelli.
+poi il nuovo programma per scaricare da GitHub le regole del sito.
 Se questa seconda fase fallisce, il nuovo programma resta installato e il comando
 segnala di correggere l'errore e ripetere update.
 
@@ -182,16 +182,24 @@ Per esecuzioni Python e per Windows, se è disponibile un binario più recente,
 il comando richiede l'installazione della release; non sostituisce un interprete
 Python o un eseguibile Windows in uso.
 
-`--dry-run` controlla la release senza scaricare eseguibili o scrivere file. Se è
-più recente, segnala che le regole saranno aggiornate dai modelli di quella release;
-non simula le differenze di modelli che non ha scaricato. Se il binario è già aggiornato,
-mostra il piano delle regole locali. Con `--offline` aggiorna solo le regole usando
-la versione già installata, senza accedere alla rete. Un errore di rete interrompe
-l'aggiornamento senza cambiare il sito; non viene ignorato automaticamente.
+Dalla versione `0.1.0a9` le istruzioni Markdown sono distribuite separatamente dal
+programma: non sono incluse negli eseguibili. `init` e `update` scaricano i file
+in `src/websmith/resources/` dal ramo `main` di GitHub, fissando tutti i download
+alla stessa revisione. Un push delle regole su `main` basta per renderle disponibili:
+non occorre cambiare versione o ricompilare il programma. Il controllo delle release
+per l'eseguibile resta separato e non lo sostituisce a parità di versione.
+
+`--dry-run` controlla la release e scarica le istruzioni per mostrare le differenze,
+senza sostituire l'eseguibile né scrivere nel sito o nella cache.
+Con `--offline`, disponibile anche per `init`, usa l'ultima copia esterna scaricata
+in `~/.cache/websmith/instructions/` (oppure sotto `XDG_CACHE_HOME`). Al primo uso
+serve una connessione; in sviluppo si possono usare i file del checkout.
+Un errore di rete interrompe l'aggiornamento senza cambiare il sito.
+La revisione delle istruzioni è registrata in `.websmith/project.json`.
 Fuori da un sito, `update` aggiorna soltanto il programma.
 
 Dalla versione `0.1.0a7` le tre guide sono basi gestite da Websmith: vengono
-aggiunte o sostituite con i modelli della versione installata, anche se erano
+aggiunte o sostituite con i modelli scaricati da GitHub, anche se erano
 state modificate direttamente. Le basi sostituite sono conservate per recupero
 in `.websmith/update-backups/VERSIONE/IMPRONTA/`; quelle copie non sono regole attive.
 

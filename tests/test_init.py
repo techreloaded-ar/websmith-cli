@@ -9,6 +9,8 @@ import unittest
 
 class InitTests(unittest.TestCase):
     def cli(self, root, *args, input=None):
+        if args and args[0] == 'init':
+            args = (*args, '--offline')
         command = [os.environ['WEBSMITH_TEST_BINARY']] if os.environ.get('WEBSMITH_TEST_BINARY') else [sys.executable, '-m', 'websmith']
         return subprocess.run([*command, *args], cwd=root, input=input, text=True, capture_output=True)
 
@@ -23,7 +25,7 @@ class InitTests(unittest.TestCase):
             root = Path(directory)
             self.ok(self.cli(root, 'init', '--yes', '--name', 'Caffè & Studio', '--agent', 'codex'))
             self.assertTrue((root / '.agents/skills/websmith-site/SKILL.md').is_file())
-            from websmith.initialize import RULES_ROOT
+            RULES_ROOT = Path(__file__).resolve().parents[1] / 'src/websmith/resources/rules'
             for name in ('AGENTS.md', 'COMPOSITION_GUIDE.md', 'TONE_OF_VOICE.md', 'EDITORIAL_RULES.md'):
                 self.assertEqual((root / name).read_bytes(), (RULES_ROOT / name).read_bytes())
             self.assertFalse((root / '.websmith/rules.md').exists())
