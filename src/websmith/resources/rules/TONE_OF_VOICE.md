@@ -2,7 +2,7 @@
 
 > Base gestita da Websmith. Dopo questo file leggere `TONE_OF_VOICE.local.md`, se presente: le indicazioni locali integrano e prevalgono sui punti corrispondenti. L'assenza del file locale è normale. Per personalizzare le regole del sito, l'agente scrive solo nel file `.local.md`, senza modificare questa base.
 
-Derivato esclusivamente dalla Parte 2 di `linee-guida-agente-editor.md`, quarta versione del 15 novembre 2026. Per la fedeltà al testo e i limiti della revisione si applica `EDITORIAL_RULES.md`.
+Per la fedeltà al testo e i limiti della revisione si applica `EDITORIAL_RULES.md`.
 
 ## Scheda del sito da compilare
 
