@@ -1,0 +1,4 @@
+# Keep bundled models and test baselines identical on every platform.
+*.md text eol=lf
+*.py text eol=lf
+*.yml text eol=lf
