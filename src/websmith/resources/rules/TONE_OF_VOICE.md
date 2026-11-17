@@ -31,8 +31,6 @@ Due o tre testi già pubblicati che rappresentano bene la voce del sito. È il p
 
 ## Esempio: proposta per TechReloaded Stories
 
-Le voci seguenti provengono dal documento sorgente e sono raccomandazioni da confermare, non regole attive per questo sito.
-
 **Tone of voice**
 
 | Parametro | Proposta |
