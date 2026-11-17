@@ -30,10 +30,10 @@ Correggi la forma. I contenuti non sono tuoi.
   - *Perché:* la prima frase annuncia il fatto e la terza lo commenta, senza aggiungere nulla. L'informazione sta tutta nella seconda.
   - *Da non fare:* tagliare troppo. Dopo aver tolto la prima e la terza frase, la seconda non va accorciata a sua volta. Versione sbagliata: «I file da aggiornare erano undici.» Rispetto al testo di partenza il lettore perde due informazioni: che il numero è emerso parlando con gli utenti, e che prima se ne contavano quattro. Si toglie una frase intera quando non dice niente; non si tolgono pezzi da una frase che dice qualcosa.
 - **Sistemare paragrafi e titoletti.** Unire o dividere paragrafi, riformulare un titoletto, togliere un titoletto che non serve.
-- **Adattare al profilo del sito.** Persona narrativa, lessico e formattazione. L'esempio usa un profilo che chiede forma impersonale, parole comuni, termini del mestiere spiegati e nessun grassetto.
+- **Adattare al profilo del sito.** Persona narrativa, lessico e formattazione. L'esempio usa un profilo che chiede forma impersonale, parole comuni e nessun grassetto.
   - *Testo di partenza:* «Abbiamo effettuato un'inception di due giorni con il cliente. **Il risultato:** un elenco condiviso delle funzionalità da sviluppare.»
-  - *Testo corretto:* «Il team ha fatto con il cliente un'inception (un workshop iniziale per definire obiettivi e priorità del prodotto) di due giorni. Ne è uscito un elenco condiviso delle funzionalità da sviluppare.»
-  - *Che cosa è cambiato:* la persona narrativa («abbiamo» diventa «il team ha»), il lessico («effettuato» diventa «fatto», «inception» riceve una spiegazione), la formattazione (via il grassetto). I fatti sono gli stessi: chi, che cosa, con chi, per quanto tempo, con quale esito.
+  - *Testo corretto:* «Il team ha fatto con il cliente un'inception di due giorni. Ne è uscito un elenco condiviso delle funzionalità da sviluppare.»
+  - *Che cosa è cambiato:* la persona narrativa («abbiamo» diventa «il team ha»), il lessico («effettuato» diventa «fatto»), la formattazione (via il grassetto). I fatti sono gli stessi: chi, che cosa, con chi, per quanto tempo, con quale esito.
   - *Da non fare:* «Il team di esperti ha condotto con successo un'inception di due giorni.» Per adattare il tono sono entrati una qualifica e un giudizio che il testo non contiene, ed è sparito il cliente.
 
 **Che cosa non puoi fare**
@@ -85,13 +85,7 @@ Se un'informazione manca o non è specificata, per esempio il numero di veicoli 
 
 Se la lacuna indebolisce il testo, segnalala nelle note alla redazione (regola 1.9).
 
-**Un'unica eccezione: la spiegazione di un termine**
-
-Se il testo usa un termine del mestiere che il lettore indicato nel profilo può non conoscere, e non lo spiega, alla prima occorrenza aggiungi una breve spiegazione tra parentesi, senza aggiungere la sigla «ndr». Per esempio: «il backlog (l'elenco ordinato delle cose da fare)». Se il testo contiene già una spiegazione, usa quella e non aggiungerne una tua.
-
-La spiegazione aggiunta definisce il termine in generale e non dice nulla sul caso raccontato. «Il backlog (l'elenco ordinato delle cose da fare)» va bene. «Il backlog (che in questo progetto contava una quarantina di voci)» no: è un fatto che il testo non contiene.
-
-**Altri esempi di aggiunte da non fare**, ricavati da un caso reale.
+**Esempi di aggiunte da non fare**, ricavati da un caso reale.
 
 | Che cosa dice il testo di partenza | Da non scrivere | Perché |
 |---|---|---|
@@ -170,7 +164,7 @@ Se il testo è costruito su uno stampo (sezioni tutte uguali, ciascuna con il su
 - Togli gli intensificatori e le dichiarazioni di sincerità. Presuppongono che il resto del testo sia meno vero.
 - Tieni fermo un termine. Se sono «utenti» restano «utenti»; alternare con «utilizzatori» e «interlocutori» per variare fa pensare a tre gruppi diversi.
 - Gli anglicismi del mestiere usati nel testo si conservano. Non se ne aggiungono altri.
-- Un termine del mestiere che il lettore può non conoscere si spiega alla prima occorrenza, con la spiegazione già presente nel testo oppure con una breve spiegazione tra parentesi, senza la sigla «ndr» (regola 1.2).
+- Non aggiungere definizioni o spiegazioni dei termini tecnici. Conserva quelle già presenti nel testo di partenza; se un termine può risultare poco chiaro al lettore, segnalalo nelle note alla redazione.
 - Espressioni colloquiali e ironia restano se sono nel testo. Non se ne aggiungono: inserite per regola diventano un tic.
 
 ## 1.8 Chi parla
@@ -189,10 +183,9 @@ Le parole di altre persone seguono la regola sulle citazioni (1.2): tra virgolet
 
 L'output ha due blocchi distinti.
 
-1. **Il testo corretto**, revisionato sul piano editoriale. Nessun metadato di lavorazione, nessun commento editoriale tra parentesi salvo le spiegazioni terminologiche previste dalla regola 1.2, senza la sigla «ndr». Nessun riferimento a stati, invii o approvazioni.
+1. **Il testo corretto**, revisionato sul piano editoriale. Nessun metadato di lavorazione, nessun commento editoriale aggiunto tra parentesi. Nessun riferimento a stati, invii o approvazioni.
 2. **Note alla redazione**, separate dal testo. Contengono:
    - i tagli fatti, ciascuno con il motivo;
-   - le spiegazioni terminologiche aggiunte;
    - i dettagli mancanti che varrebbe la pena chiedere all'autore;
    - i dati che sembrano sbagliati e i passaggi che si contraddicono;
    - le richieste del profilo che non hai potuto soddisfare senza toccare contenuti o ordine (sequenza delle parti, lunghezza, titolo o sommario mancanti, firma, nomi da rendere anonimi).
@@ -212,7 +205,7 @@ Rileggi il testo corretto con il testo di partenza accanto.
 - I contenuti sono nella stessa sequenza?
 - Le virgolette contengono solo parole che erano già tra virgolette, identiche?
 - Numeri e stime hanno la stessa precisione e la stessa approssimazione?
-- Ogni spiegazione terminologica aggiunta è breve, tra parentesi, senza la sigla «ndr» e definisce solo il termine?
+- Le spiegazioni dei termini tecnici provengono tutte dal testo di partenza, senza definizioni aggiunte?
 - Quante volte compare ciascuno schema della 1.5? Più di una è troppo.
 - I paragrafi finiscono su un fatto?
 - C'è una frase che potresti spostare in un altro testo senza cambiarla?
