@@ -1,17 +1,16 @@
+**Versione:** 5
+**Data:** 20 novembre 2026
+
+
 # Regole editoriali
 
 > Base gestita da Websmith. Dopo questo file leggere `EDITORIAL_RULES.local.md`, se presente: le indicazioni locali integrano e prevalgono sui punti corrispondenti. L'assenza del file locale è normale. Per personalizzare le regole del sito, l'agente scrive solo nel file `.local.md`, senza modificare questa base.
-
-**Stato:** quarta versione
-**Data:** 15 novembre 2026
 
 ## A cosa serve questo documento
 
 L'agente editor riceve un testo già scritto (un articolo, un post, un'intervista, un resoconto) e ne corregge la forma. Non sa chi ha prodotto il testo né con quale procedimento, e non ne ha bisogno: lavora su ciò che trova sulla pagina.
 
 L'editor interviene in due modi: riformula e toglie il superfluo. Non aggiunge nulla che nel testo di partenza non ci sia, non sposta i contenuti e non decide di che cosa parla il testo. Contenuti, ordine e taglio restano quelli dell'autore.
-
-Questo documento deriva esclusivamente da `linee-guida-agente-editor.md`, quarta versione del 15 novembre 2026, comprese le correzioni concordate sulle spiegazioni terminologiche, sulle affermazioni generiche e sui tempi verbali.
 
 Si applica alla revisione di un testo già scritto. Il profilo del sito è ripartito fra `TONE_OF_VOICE.md` (voce, pubblico e lessico) e i parametri editoriali di questo file (formato, contenuto e struttura). Sulle scelte di stile vale il profilo del sito; i limiti dell'intervento (1.1) e la fedeltà alla fonte (1.2) valgono sempre.
 
@@ -20,6 +19,8 @@ Si applica alla revisione di un testo già scritto. Il profilo del sito è ripar
 ## 1.1 Che cosa puoi cambiare e che cosa no
 
 Correggi la forma. I contenuti non sono tuoi.
+
+La fedeltà alla fonte riguarda le informazioni, il significato, il grado di certezza e la sequenza degli argomenti. La suddivisione originale in frasi, paragrafi ed elenchi può essere modificata: conservare i contenuti non richiede di conservare la forma espositiva della fonte.
 
 **Che cosa puoi fare**
 
@@ -49,7 +50,7 @@ Correggi la forma. I contenuti non sono tuoi.
 | Situazione | Da fare | Da non fare |
 |---|---|---|
 | Il testo apre con tre righe sull'intelligenza artificiale che trasforma il lavoro, poi racconta il caso. | Togliere le tre righe: non portano informazione. | Scrivere un nuovo attacco con una scena che il testo non contiene. |
-| Il profilo del sito chiede di cominciare dal problema. Il testo comincia dal metodo di lavoro e arriva al problema nel terzo paragrafo. | Lasciare l'ordine com'è e segnalarlo nelle note. | Portare il terzo paragrafo in apertura. |
+| Il profilo editoriale chiede di cominciare dal problema. Il testo comincia dal metodo di lavoro e arriva al problema nel terzo paragrafo. | Lasciare l'ordine com'è e segnalarlo nelle note. | Portare il terzo paragrafo in apertura. |
 | Un paragrafo racconta come è nato il contatto con il cliente. Ti sembra poco utile al lettore. | Lasciarlo, riformulato se serve. Se pensi che vada tolto, scrivilo nelle note. | Tagliarlo per accorciare il testo. |
 | Lo stesso numero compare nell'introduzione e, con più dettagli, a metà del testo. | Tenere la seconda occorrenza e togliere la prima. | Tenerle entrambe, o fonderle in una frase nuova messa in un terzo punto. |
 | Il testo è più lungo di quanto prevede il profilo anche dopo aver tolto il superfluo. | Consegnarlo così e segnalare la lunghezza nelle note. | Tagliare fatti o episodi per rientrare nel limite. |
@@ -150,12 +151,15 @@ Per capire se hai corretto o solo ritoccato, guarda che cosa è rimasto: se nell
 
 ## 1.6 Ritmo e struttura
 
-- Alterna frasi brevi e frasi lunghe secondo il contenuto. Una sequenza di frasi tutte della stessa misura è monotona quanto una sequenza di frasi tutte spezzate. Puoi unire due frasi o dividerne una, se il contenuto resta lo stesso.
-- I paragrafi hanno la lunghezza del loro argomento. Puoi unire o dividere paragrafi, senza cambiare la sequenza dei contenuti.
+- Valuta sempre la costruzione complessiva dei paragrafi, oltre alle singole frasi. I paragrafi hanno la lunghezza del loro argomento: puoi unirli o dividerli, senza cambiare la sequenza dei contenuti.
+- Alterna frasi brevi e frasi lunghe secondo il contenuto. Una sequenza di frasi tutte della stessa misura è monotona quanto una sequenza di frasi tutte spezzate. Unisci le frasi isolate che sviluppano lo stesso ragionamento, creando continuità logica; puoi dividerne una se serve. Unire le frasi non autorizza ad aggiungere cause, conseguenze o conclusioni assenti dalla fonte.
 - I titoletti servono a orientarsi in un testo lungo. In un testo breve ne bastano pochi o nessuno: puoi togliere quelli che non servono e riformulare quelli vaghi. Non creare sezioni nuove.
-- Elenchi puntati e grassetti nel corpo del testo solo se il profilo del sito li prevede. Un elenco puntato che il profilo non ammette si riscrive in prosa, con tutti i suoi elementi e nello stesso ordine.
+- Scegli la forma degli elenchi in base alla loro funzione. Trasformali in prosa quando sviluppano un discorso, conservando tutti gli elementi e il loro ordine. Mantienili quando facilitano la consultazione, come procedure, requisiti o voci da confrontare, nel rispetto dei vincoli del profilo. La presenza di un elenco nella fonte non giustifica da sola il suo mantenimento; non trasformare però automaticamente tutti gli elenchi in prosa.
+- Elenchi puntati e grassetti nel corpo del testo solo se il profilo del sito li prevede. Se il profilo non ammette un elenco puntato, applica la riscrittura in prosa descritta sopra.
 
-Se il testo è costruito su uno stampo (sezioni tutte uguali, ciascuna con il suo titoletto e i suoi due paragrafi), alleggeriscilo togliendo titoletti e unendo paragrafi. Se non basta, segnalalo nelle note: ricostruire la struttura non è compito tuo.
+Questi interventi fanno parte della prima revisione editoriale, anche per documenti di visione e strategia, prima dell'eventuale adattamento al web. Restano fermi i limiti della 1.1: nessuna aggiunta di contenuto, nessun taglio di informazioni e nessun cambiamento nella sequenza degli argomenti.
+
+Se il testo è costruito su uno stampo (sezioni tutte uguali, ciascuna con il suo titoletto e i suoi due paragrafi), alleggeriscilo togliendo titoletti e unendo paragrafi. Se per superare lo stampo occorre cambiare contenuti, sequenza degli argomenti o taglio, segnala il limite nelle note.
 
 ## 1.7 Lessico
 
@@ -194,7 +198,7 @@ Nessun trucco tipografico (caratteri sostituiti, spazi invisibili) e nessun pass
 
 ## 1.10 Non ripetersi da un testo all'altro
 
-Uno stampo si riconosce anche a distanza: stesso tipo di attacco, stesso numero di titoletti, stessa chiusura in ogni articolo. Se ricevi gli ultimi testi pubblicati sul sito, confrontali con quello che stai correggendo. Per la parte che dipende da te (formulazione dei titoletti, costruzione delle frasi di apertura e di chiusura) non riprodurre le stesse soluzioni. Per la parte che non dipende da te (ordine e struttura) segnala la somiglianza nelle note.
+Uno stampo si riconosce anche a distanza: stesso tipo di attacco, stesso numero di titoletti, stessa chiusura in ogni articolo. Se ricevi gli ultimi testi pubblicati sul sito, confrontali con quello che stai correggendo. Per la parte che dipende da te (formulazione dei titoletti, costruzione delle frasi di apertura e di chiusura, suddivisione in paragrafi e forma degli elenchi secondo la 1.6) non riprodurre le stesse soluzioni. Per la parte che non dipende da te (sequenza degli argomenti e taglio) segnala la somiglianza nelle note.
 
 ## 1.11 Rilettura prima della consegna
 
@@ -203,6 +207,7 @@ Rileggi il testo corretto con il testo di partenza accanto.
 - Ogni fatto del testo corretto è presente nel testo di partenza?
 - Ogni fatto, numero, episodio e citazione del testo di partenza è ancora presente?
 - I contenuti sono nella stessa sequenza?
+- Sono state valutate anche la suddivisione in paragrafi e la funzione degli elenchi? Le sequenze di frasi isolate e gli elenchi mantenuti hanno una funzione nel testo revisionato, oppure riproducono soltanto la forma della fonte?
 - Le virgolette contengono solo parole che erano già tra virgolette, identiche?
 - Numeri e stime hanno la stessa precisione e la stessa approssimazione?
 - Le spiegazioni dei termini tecnici provengono tutte dal testo di partenza, senza definizioni aggiunte?
@@ -213,6 +218,8 @@ Rileggi il testo corretto con il testo di partenza accanto.
 - I tempi verbali rispettano le informazioni della fonte, senza suggerire che un problema sia risolto o un progetto concluso, né che una condizione passata sia ancora attuale senza conferma?
 - Letto ad alta voce, sembra una persona che racconta?
 - Ogni taglio è riportato nelle note?
+
+La revisione può essere dichiarata completata solo dopo aver svolto tutti questi controlli, compresa la verifica della suddivisione in paragrafi e della funzione degli elenchi.
 
 ## 1.12 Tempi verbali e stato del progetto
 
