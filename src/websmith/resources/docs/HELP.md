@@ -222,6 +222,17 @@ La pubblicazione remota è un passaggio separato, configurato per il singolo sit
 
 ## Bozze Markdown dalla posta
 
+Quando si chiede all'agente «controlla se c'è posta per me», il controllo riguarda
+solo la casella `trtalks@techreloaded.it` e il `site.id` letto dal `websmith.yaml`
+corrente. Prima della ricerca verificare l'account: non usare la casella personale,
+nemmeno con un filtro sul destinatario. Se la casella autorizzata non è accessibile,
+fermarsi. Nella casella autorizzata filtrare per destinatario `trtalks@techreloaded.it`
+e tag del sito nell'oggetto, verificando entrambi per ogni messaggio.
+Vale anche con Gmail e altri connettori; non estendere la ricerca ad altri account,
+destinatari o siti. La CLI IMAP filtra solo per sito: l'agente può usarla per queste
+richieste solo con l'account autorizzato e una cartella contenente esclusivamente
+messaggi destinati a `trtalks@techreloaded.it`.
+
 ```bash
 websmith inbox configure --host imap.esempio.it --username bozze@esempio.it
 websmith inbox fetch
