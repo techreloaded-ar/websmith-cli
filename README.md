@@ -192,6 +192,18 @@ l'uscita 2 segnala un errore. `--dry-run` non scrive alcun file.
 
 ## Ricevere bozze Markdown dalla posta
 
+Le richieste all'agente come «controlla se c'è posta per me» riguardano solo la
+casella `trtalks@techreloaded.it` e il `site.id` del `websmith.yaml` corrente.
+Le istruzioni distribuite in `AGENTS.md` richiedono di verificare l'account prima
+della ricerca, anche con Gmail: un filtro sul destinatario nella casella personale
+non basta. Se la casella autorizzata non è accessibile, l'agente si ferma.
+Nella casella autorizzata cerca solo messaggi destinati a `trtalks@techreloaded.it`
+con il tag del sito nell'oggetto, verificando entrambi per ogni messaggio.
+Non estende la ricerca ad altri account, destinatari o siti se non ci sono risultati.
+La CLI IMAP descritta sotto filtra per sito; per queste richieste l'agente può
+usarla solo con l'account autorizzato e una cartella contenente esclusivamente
+messaggi destinati a `trtalks@techreloaded.it`.
+
 Nella cartella del sito configurare la casella IMAP, anche se condivisa con altri siti:
 
 ```bash
