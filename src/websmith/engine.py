@@ -3723,27 +3723,27 @@ def build_parser() -> argparse.ArgumentParser:
     update_parser.add_argument("--offline", action="store_true", help="Usa la copia esterna delle istruzioni già scaricata, senza rete")
     update_parser.set_defaults(func=command_update)
 
-    inspect_parser = subparsers.add_parser("inspect", help="Inspect site structure without writing files")
+    inspect_parser = subparsers.add_parser("inspect", help="Esamina la struttura del sito senza scrivere file")
     inspect_parser.add_argument("site", nargs="?", help="Website name under websites/")
     inspect_parser.set_defaults(func=command_inspect)
 
     validate_site_parser = subparsers.add_parser(
         "validate-site",
-        help="Validate a site's websmith.yaml manifest and referenced local resources",
+        help="Controlla il manifest websmith.yaml e le risorse locali dichiarate",
     )
     validate_site_parser.add_argument("site", nargs="?", help="Website name under websites/")
     validate_site_parser.set_defaults(func=command_validate_site)
 
     validate_parser = subparsers.add_parser(
         "validate-frontmatter",
-        help="Validate Markdown YAML frontmatter for a website",
+        help="Controlla il front matter YAML delle pagine Markdown",
     )
     validate_parser.add_argument("site", nargs="?", help="Website name under websites/")
     validate_parser.set_defaults(func=command_validate_frontmatter)
 
     validate_page_parser = subparsers.add_parser(
         "validate-page",
-        help="Validate one Markdown page contract before rendering",
+        help="Controlla una singola pagina Markdown prima della generazione",
     )
     validate_page_parser.add_argument("site", help="Website name under websites/")
     validate_page_parser.add_argument("lang", help="Language declared by the site's websmith.yaml")
@@ -3755,7 +3755,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     validate_pages_parser = subparsers.add_parser(
         "validate-pages",
-        help="Validate all Markdown page contracts before rendering",
+        help="Controlla tutte le pagine Markdown prima della generazione",
     )
     validate_pages_parser.add_argument("site", nargs="?", help="Website name under websites/")
     validate_pages_parser.add_argument(
@@ -3767,7 +3767,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     validate_family_parser = subparsers.add_parser(
         "validate-family",
-        help="Validate and render a multilingual page family by canonical id prefix",
+        help="Controlla e rigenera una famiglia di pagine multilingue per prefisso dell'ID",
     )
     validate_family_parser.add_argument("family_id", help="Canonical family id, for example archetipo")
     validate_family_parser.add_argument("--site", default=None)
@@ -3780,7 +3780,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     resolve_page_parser = subparsers.add_parser(
         "resolve-page",
-        help="Resolve generated HTML back to the site's canonical Markdown source",
+        help="Risale da un HTML generato al Markdown canonico",
     )
     resolve_page_parser.add_argument("site", help="Website name under websites/")
     resolve_page_parser.add_argument("output", help="Generated HTML output path under websites/<site>/web")
@@ -3788,7 +3788,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     sync_translations_parser = subparsers.add_parser(
         "sync-translations",
-        help="Check configured translations for a canonical page id",
+        help="Controlla le traduzioni configurate di una pagina",
     )
     sync_translations_parser.add_argument("page_id", help="Canonical page id from Markdown frontmatter")
     sync_translations_parser.add_argument("--site", default=None)
@@ -3796,7 +3796,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     parse_component_parser = subparsers.add_parser(
         "parse-component",
-        help="Parse one Markdown component block without generating HTML",
+        help="Analizza un blocco componente senza generare HTML",
     )
     parse_component_parser.add_argument("site", help="Website name under websites/")
     parse_component_parser.add_argument("file", help="Markdown file to inspect")
@@ -3805,7 +3805,7 @@ def build_parser() -> argparse.ArgumentParser:
 
     render_root_index_parser = subparsers.add_parser(
         "render-root-index",
-        help="Render a site's configured root language redirect",
+        help="Genera la pagina di ingresso che rimanda alle lingue",
     )
     render_root_index_parser.add_argument(
         "--site",
@@ -3817,14 +3817,14 @@ def build_parser() -> argparse.ArgumentParser:
 
     render_index_parser = subparsers.add_parser(
         "render-index",
-        help="Render TechReloaded index.md to web/ita/index.html",
+        help="(storico TechReloaded) Genera la homepage in web/ita/index.html",
     )
     render_index_parser.add_argument("--lang", default="ita")
     render_index_parser.set_defaults(func=command_render_index)
 
     render_page_parser = subparsers.add_parser(
         "render-page",
-        help="Render a page by canonical frontmatter id using its configured output",
+        help="Genera una pagina dal suo ID canonico nel percorso configurato",
     )
     render_page_parser.add_argument("page_id", help="Canonical page id from Markdown frontmatter")
     render_page_parser.add_argument(
@@ -3847,50 +3847,50 @@ def build_parser() -> argparse.ArgumentParser:
 
     render_archetipo_parser = subparsers.add_parser(
         "render-archetipo",
-        help="Render TechReloaded archetipo.md to web/ita/prodotti/archetipo/index.html",
+        help="(storico TechReloaded) Genera la pagina Archetipo",
     )
     render_archetipo_parser.add_argument("--lang", default="ita")
     render_archetipo_parser.set_defaults(func=command_render_archetipo)
 
     render_archetipo_beta_parser = subparsers.add_parser(
         "render-archetipo-beta",
-        help="Render TechReloaded archetipo-beta.md to web/ita/prodotti/archetipo/beta.html",
+        help="(storico TechReloaded) Genera la pagina beta di Archetipo",
     )
     render_archetipo_beta_parser.add_argument("--lang", default="ita")
     render_archetipo_beta_parser.set_defaults(func=command_render_archetipo_beta)
 
     render_documentazione_parser = subparsers.add_parser(
         "render-documentazione",
-        help="Render archetipo-documentazione.md to web/ita/prodotti/archetipo/documentazione.html",
+        help="(storico TechReloaded) Genera la documentazione di Archetipo",
     )
     render_documentazione_parser.add_argument("--lang", default="ita")
     render_documentazione_parser.set_defaults(func=command_render_documentazione)
 
     render_team_parser = subparsers.add_parser(
         "render-team",
-        help="Render team/index.md to web/ita/team/index.html",
+        help="(storico TechReloaded) Genera l'indice del team",
     )
     render_team_parser.add_argument("--lang", default="ita")
     render_team_parser.set_defaults(func=command_render_team)
 
     render_team_pages_parser = subparsers.add_parser(
         "render-team-pages",
-        help="Render team person Markdown files to web/ita/team/*.html",
+        help="(storico TechReloaded) Genera le schede delle persone del team",
     )
     render_team_pages_parser.add_argument("--lang", default="ita")
     render_team_pages_parser.add_argument("--slug", help="Render only one team person slug", default=None)
     render_team_pages_parser.set_defaults(func=command_render_team_pages)
 
     help_parser = subparsers.add_parser(
-        "HELP", aliases=["help"], help="Elenca i comandi con scopo, sintassi ed esempi in italiano",
+        "HELP", aliases=["help"], help="Panoramica: cosa puoi fare, prompt per l'agente e comandi (HELP guida per la guida completa)",
     )
     help_parser.add_argument(
-        "topic", nargs="?", choices=sorted(subparsers.choices),
-        help="Comando di cui mostrare tutte le opzioni",
+        "topic", nargs="?", choices=sorted([*subparsers.choices, HELP_GUIDE_TOPIC]),
+        help=f"Comando di cui mostrare tutte le opzioni, oppure {HELP_GUIDE_TOPIC} per la guida completa",
     )
 
     def show_help(args: argparse.Namespace) -> int:
-        if args.topic:
+        if args.topic and args.topic != HELP_GUIDE_TOPIC:
             subparsers.choices[args.topic].print_help()
         else:
             from .rule_source import load
@@ -3902,12 +3902,42 @@ def build_parser() -> argparse.ArgumentParser:
                 except (ValueError, OSError) as exc:
                     print(f"Documentazione non disponibile: {exc}. Usa websmith --help.")
                     return 2
-            print(resources["docs/HELP.md"])
+            text = resources["docs/HELP.md"]
+            if args.topic == HELP_GUIDE_TOPIC or HELP_GUIDE_MARKER not in text:
+                # Una copia delle istruzioni precedente alla panoramica non ha il
+                # separatore: in quel caso si mostra l'intera guida come prima.
+                print(text.replace(HELP_GUIDE_MARKER, "").strip())
+            else:
+                print(text.split(HELP_GUIDE_MARKER, 1)[0].strip())
+                print()
+                print(command_overview(subparsers))
         return 0
 
     help_parser.set_defaults(func=show_help)
 
     return parser
+
+
+HELP_GUIDE_TOPIC = "guida"
+HELP_GUIDE_MARKER = "<!-- websmith:guida -->"
+
+
+def command_overview(subparsers: argparse._SubParsersAction) -> str:
+    """Elenco dei comandi ricavato dal parser, sempre allineato al programma."""
+    entries = [
+        (action.dest, action.help or "")
+        for action in subparsers._choices_actions
+        if action.dest != "help"
+    ]
+    width = max(len(name) for name, _ in entries)
+    lines = ["## Tutti i comandi da shell", ""]
+    lines += [f"  websmith {name.ljust(width)}  {description}" for name, description in entries]
+    lines += [
+        "",
+        "Opzioni di un comando: websmith HELP COMANDO (oppure websmith COMANDO --help).",
+        f"Guida completa con esempi: websmith HELP {HELP_GUIDE_TOPIC}",
+    ]
+    return "\n".join(lines)
 
 
 def available_sites() -> list[str]:

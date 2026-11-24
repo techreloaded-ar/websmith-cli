@@ -91,7 +91,7 @@ Non annullare modifiche estranee dei collaboratori. Non eliminare file legacy o 
 
 ## Richieste di aiuto
 
-Quando l'utente chiede HELP, spiegare scopo, sintassi ed esempi dei comandi in italiano. Consultare `websmith HELP` e verificare le opzioni correnti con `websmith COMANDO --help` oppure `websmith HELP COMANDO`. La richiesta di aiuto non autorizza a eseguire le operazioni illustrate. Distinguere sempre comandi locali generici e scorciatoie storiche specifiche di TechReloaded.
+Quando l'utente chiede HELP, spiegare scopo, sintassi ed esempi dei comandi in italiano. Consultare `websmith HELP` per la panoramica con i prompt di esempio, `websmith HELP guida` per la guida completa, e verificare le opzioni correnti con `websmith COMANDO --help` oppure `websmith HELP COMANDO`. La richiesta di aiuto non autorizza a eseguire le operazioni illustrate. Distinguere sempre comandi locali generici e scorciatoie storiche specifiche di TechReloaded.
 
 ## Composizione iniziale
 

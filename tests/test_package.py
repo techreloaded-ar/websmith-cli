@@ -54,6 +54,28 @@ class PackageTests(unittest.TestCase):
         self.assertEqual(version_result.stdout.strip(), f'websmith {__version__}')
         self.assert_ok(self.run_cli('HELP'))
 
+    def test_help_overview_and_full_guide(self):
+        resources = Path(engine.__file__).parent / 'resources'
+        env = {**os.environ, 'WEBSMITH_RESOURCE_DIR': str(resources)}
+        run = lambda *args: subprocess.run(
+            [sys.executable, '-m', 'websmith', *args], text=True, capture_output=True, env=env,
+        )
+        overview = run('HELP')
+        self.assert_ok(overview)
+        self.assertIn('## Prompt per l\'agente', overview.stdout)
+        self.assertIn('## Tutti i comandi da shell', overview.stdout)
+        for command in ('init', 'validate-pages', 'render-page', 'inbox', 'import', 'update'):
+            self.assertIn(f'websmith {command} ', overview.stdout)
+        self.assertNotIn('## Selezionare il sito', overview.stdout)
+        self.assertNotIn('websmith:guida', overview.stdout)
+        guide = run('help', 'guida')
+        self.assert_ok(guide)
+        self.assertIn('## Selezionare il sito', guide.stdout)
+        self.assertNotIn('websmith:guida', guide.stdout)
+        command = run('HELP', 'render-page')
+        self.assert_ok(command)
+        self.assertIn('--all-langs', command.stdout)
+
     def test_external_site_and_repeatable_render(self):
         with tempfile.TemporaryDirectory(prefix='websmith site ') as directory:
             root = Path(directory)

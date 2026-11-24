@@ -1,6 +1,62 @@
-# HELP — Comandi Websmith
+# HELP — Websmith
 
-Usare `websmith HELP` (oppure `websmith help`) per questa guida e
+Websmith genera siti statici da sorgenti Markdown, in modo deterministico.
+Il lavoro si divide fra te, l'agente AI (Codex o Claude) e il programma:
+tu chiedi, l'agente scrive e modifica i sorgenti, Websmith valida e genera l'HTML.
+Websmith non scrive testi, non traduce e non pubblica il sito online.
+
+## Cosa puoi fare
+
+- Creare un nuovo sito in una cartella vuota, con istruzioni per Codex o Claude.
+- Scrivere e modificare pagine in Markdown, anche in più lingue.
+- Controllare manifest, front matter, pagine e traduzioni prima di generare.
+- Generare l'HTML delle pagine e l'anteprima locale in `web/`.
+- Personalizzare tone of voice, regole editoriali e composizione del sito
+  nei file `.local.md`.
+- Importare un sito pubblico esistente come punto di partenza.
+- Scaricare dalla posta le bozze Markdown inviate dagli agenti di intervista.
+- Aggiornare il programma e le istruzioni del sito da GitHub.
+
+## Prompt per l'agente
+
+Apri la cartella del sito in Codex o Claude e scrivi, per esempio:
+
+- «Crea la pagina Chi siamo con questi contenuti: … Poi validala e generala.»
+- «Nella homepage sostituisci il paragrafo di apertura con: …»
+- «Traduci in inglese la pagina servizi e controlla l'allineamento delle traduzioni.»
+- «Rivedi il testo della pagina contatti secondo le regole editoriali del sito.»
+- «Aggiungi al tone of voice del sito che usiamo sempre il tu.»
+- «Controlla che tutto il sito sia valido e dimmi cosa va corretto.»
+- «Rigenera tutte le pagine in tutte le lingue e verifica link e immagini.»
+- «Ho scaricato le bozze con inbox fetch: trasformale in pagine del sito.»
+- «Importa https://www.esempio.it e proponi come convertirlo in pagine Markdown.»
+- «Esegui websmith update --dry-run e spiegami cosa cambierebbe.»
+- «HELP render-page»: l'agente spiega il comando senza eseguirlo.
+
+L'agente legge `AGENTS.md` e le guide del sito; una richiesta di aiuto non lo
+autorizza a eseguire le operazioni descritte.
+
+## Comandi più usati
+
+```bash
+websmith init                         # nuovo sito nella cartella corrente
+websmith validate-site                # controlla manifest e risorse
+websmith validate-pages               # controlla tutte le pagine
+websmith render-page home --all-langs # genera una pagina in tutte le lingue
+websmith render-root-index            # genera l'ingresso alle lingue
+websmith update --dry-run             # mostra cosa cambierebbe un aggiornamento
+websmith inbox fetch                  # scarica le bozze Markdown dalla posta
+websmith import https://www.esempio.it
+```
+
+Da un'altra cartella: `websmith --site-root /percorso/del/sito COMANDO`.
+
+<!-- websmith:guida -->
+
+# Guida completa ai comandi
+
+Usare `websmith HELP` (oppure `websmith help`) per la panoramica,
+`websmith HELP guida` per questa guida e
 `websmith HELP render-page` per le opzioni correnti di un comando.
 Anche `websmith render-page --help` mostra le opzioni senza modificare file.
 In chat, una richiesta HELP serve a spiegare i comandi, non a eseguirli.
