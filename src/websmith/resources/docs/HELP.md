@@ -164,6 +164,43 @@ Aprire `web/index.html` nel browser. Modifiche durature nei sorgenti, non soltan
 nell'HTML generato. Le note alla redazione non devono entrare nel contenuto pubblicabile.
 La pubblicazione remota è un passaggio separato, configurato per il singolo sito.
 
+## Bozze Markdown dalla posta
+
+```bash
+websmith inbox configure --host imap.esempio.it --username bozze@esempio.it
+websmith inbox fetch
+websmith inbox fetch --dry-run
+```
+
+`inbox configure` imposta la casella del sito corrente in `.websmith/inbox.json`.
+Senza opzioni chiede i dati nel terminale. Usa IMAP con TLS, porta predefinita 993,
+cartella `INBOX`; sono disponibili `--port`, `--folder` e `--password-env`.
+La password non viene salvata: `fetch` la chiede senza mostrarla oppure legge
+`WEBSMITH_MAIL_PASSWORD` (o la variabile scelta). Alcuni provider richiedono una
+password per applicazioni; OAuth non è incluso.
+
+Gli agenti devono inviare allegati `.md`/`.markdown` con un solo tag nell'oggetto:
+`[websmith:IDENTIFICATIVO]`, dove IDENTIFICATIVO è `site.id` in `websmith.yaml`.
+Esempio: `[websmith:techreloaded] Bozza pagina chi siamo`. Usare `site.id` diversi
+per siti diversi. Email senza tag, di altri siti o con più tag vengono escluse;
+non basta che il nome del sito compaia nel testo. Sono accettati anche corpi MIME
+`text/markdown`, ma non normali corpi `text/plain`.
+
+Il comando salva in `drafts/inbox/CASELLA/UIDVALIDITY-UID/` i Markdown in UTF-8 e
+un `message.json` con la provenienza. Conservando questa cartella, le esecuzioni
+successive saltano le email già scaricate senza sovrascrivere modifiche locali.
+Il download di ciascuna email è atomico. Il server è letto in sola lettura:
+nessuna cancellazione, spostamento o modifica dello stato letto/non letto.
+Le bozze richiedono revisione prima di entrare nei sorgenti del sito.
+
+`fetch --dry-run` controlla solo gli oggetti, senza scaricare allegati o scrivere.
+`--limit` (50) limita messaggi salvati, con errore o elencati in dry-run; i messaggi
+ignorati e già presenti non lo consumano. `--max-message-bytes` (10000000) limita
+la dimensione della singola email e `--timeout` (30) imposta il timeout in secondi.
+Usare `websmith --site-root /percorso/del/sito inbox fetch` per un sito esplicito.
+Codici di uscita: 0 completato, 1 errori su singole email, 2 errore di
+configurazione, connessione o file. Il comando non genera né pubblica pagine.
+
 ## Importazione HTTP
 
 ```bash

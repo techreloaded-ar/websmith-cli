@@ -3681,6 +3681,9 @@ def build_parser() -> argparse.ArgumentParser:
     parser.add_argument("--version", action="version", version=f"websmith {__version__}")
     subparsers = parser.add_subparsers(dest="command", required=True)
 
+    from .inbox import add_parser as add_inbox_parser
+    add_inbox_parser(subparsers)
+
     from .import_web import command_import
     import_parser = subparsers.add_parser("import", help="Acquisisce un sito pubblico senza modificare i sorgenti Websmith")
     import_parser.add_argument("url", help="URL http/https iniziale")

@@ -190,6 +190,76 @@ da quella delle istruzioni proposte e registrano i file ancora da integrare.
 L'uscita 0 indica che il comando è terminato, anche quando restano proposte da integrare;
 l'uscita 2 segnala un errore. `--dry-run` non scrive alcun file.
 
+## Ricevere bozze Markdown dalla posta
+
+Nella cartella del sito configurare la casella IMAP, anche se condivisa con altri siti:
+
+```bash
+websmith inbox configure --host imap.esempio.it --username bozze@esempio.it
+websmith inbox fetch
+```
+
+`configure` senza opzioni chiede i dati nel terminale. Le impostazioni vengono
+salvate in `.websmith/inbox.json`, separatamente dal manifest: server, porta TLS
+(993 predefinita), username, cartella (`INBOX`) e nome della variabile password.
+La password non viene salvata né accettata come argomento: `fetch` la chiede senza
+mostrarla oppure legge `WEBSMITH_MAIL_PASSWORD`. Per le esecuzioni automatiche
+fornire la variabile tramite il proprio gestore di segreti. Se il provider lo
+richiede, usare una password per applicazioni; l'autenticazione OAuth non è inclusa.
+La connessione usa esclusivamente IMAP con TLS e verifica il certificato.
+
+Gli agenti mittenti devono allegare il draft come `.md` o `.markdown` e includere
+nell'oggetto un solo tag con il valore di `site.id` in `websmith.yaml`:
+
+```text
+[websmith:techreloaded] Nuova bozza: una giornata con TechRel
+```
+
+Il tag deve corrispondere al sito corrente: nomi simili, tag di altri siti e
+oggetti con più tag vengono esclusi. Per separare siti diversi, assegnare
+identificativi `site.id` diversi. Il destinatario o una parola nel corpo non sono
+sufficienti a identificare il sito. I messaggi preesistenti senza tag vanno
+reinviati con l'oggetto corretto.
+
+La ricerca avviene sul server; Websmith ricontrolla l'oggetto prima di recuperare
+il messaggio completo. Accetta anche corpi MIME esplicitamente `text/markdown`;
+non interpreta automaticamente il normale testo dell'email come bozza. I file
+vengono decodificati in UTF-8; gli altri allegati sono ignorati. Le email vengono
+lette in sola lettura con `BODY.PEEK`: non sono cancellate, spostate né segnate
+come lette.
+
+I risultati sono in `drafts/inbox/IDENTIFICATIVO-CASELLA/UIDVALIDITY-UID/`, con
+nomi di file resi sicuri e un `message.json` contenente provenienza e elenco dei
+file. I messaggi già acquisiti dalla stessa casella e cartella non sono scaricati
+nuovamente e i file locali non vengono sovrascritti. Il riconoscimento resta
+valido conservando la cartella con `message.json`, anche dopo aver spostato il
+Markdown nei sorgenti. Account, cartelle e nuove generazioni di UID sul server
+rimangono distinti; una nuova consegna della stessa email ha un nuovo UID.
+Il download di ciascuna email è atomico: un allegato Markdown non valido impedisce
+di salvare parzialmente quella email e il messaggio viene ritentato al prossimo giro.
+
+```bash
+websmith inbox fetch --dry-run
+websmith inbox fetch --limit 20 --max-message-bytes 10000000
+websmith --site-root /percorso/del/sito inbox fetch
+websmith inbox configure --folder "Bozze" --password-env TECHREL_MAIL_PASSWORD
+```
+
+`--dry-run` esamina solo gli oggetti delle nuove email: non verifica la presenza
+degli allegati e non scrive file. Il limite predefinito di 50 conta i messaggi
+salvati, quelli con errore e quelli elencati in dry-run; duplicati e messaggi
+ignorati non lo consumano. Ripetere il comando per proseguire. Il limite di
+dimensione predefinito è 10 MB per email, prima della decodifica MIME.
+Codici di uscita: 0 completato, 1 errori su singoli messaggi, 2 configurazione,
+connessione o accesso ai file non riusciti. Gli altri messaggi validi possono
+essere acquisiti anche se una singola email non è valida.
+
+Le bozze restano materiale da revisionare: il comando non modifica `contents/`,
+non genera pagine e non pubblica il sito. Configurazione e download sono locali
+al sito selezionato e funzionano anche dalle sue sottocartelle. Dopo una modifica
+a `site.id`, eseguire nuovamente `inbox configure` per associare la casella al
+nuovo identificativo.
+
 ## Sviluppo
 
 Richiede Python 3.11+:

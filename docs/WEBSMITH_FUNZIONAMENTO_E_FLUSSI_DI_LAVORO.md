@@ -311,6 +311,36 @@ websmith import https://www.esempio.it --browser --browser-channel chromium
 
 L'anteprima browser disattiva script, moduli e iframe. L'anteprima HTTP può ancora contattare servizi esterni attraverso questi elementi; anche nella copia browser collegamenti e risorse mancanti possono richiedere Internet. Per i requisiti di sistema e i limiti configurabili consultare README e help.
 
+### Ricevere bozze da altri agenti tramite email
+
+Il comando `websmith inbox` collega la cartella del sito a una casella IMAP TLS
+con username e password. La casella può servire più siti: il mittente deve
+includere nell'oggetto un solo tag `[websmith:IDENTIFICATIVO]` corrispondente al
+`site.id` del manifest. Siti distinti devono avere identificativi distinti.
+
+```bash
+websmith inbox configure --host imap.esempio.it --username bozze@esempio.it
+websmith inbox fetch
+```
+
+La configurazione locale è in `.websmith/inbox.json`; la password viene richiesta
+al download oppure letta da `WEBSMITH_MAIL_PASSWORD`, senza salvarla nel progetto.
+`configure` permette anche di scegliere porta TLS, cartella e nome della variabile.
+Se il provider lo richiede, usare una password per applicazioni. OAuth non è incluso.
+
+Gli allegati `.md`/`.markdown` e i corpi MIME `text/markdown` vengono acquisiti in
+`drafts/inbox/`, con metadati di provenienza e sottocartelle distinte per casella,
+cartella e UID del messaggio. I messaggi già acquisiti vengono saltati conservando
+le relative cartelle con `message.json`. Le modifiche locali ai draft sono
+preservate; una nuova consegna della stessa email ha un nuovo UID. Oggetti senza
+tag, ambigui o di altri siti sono esclusi prima del recupero del contenuto.
+
+Il server è usato in sola lettura: il download non cambia lo stato letto/non letto,
+non sposta e non cancella messaggi. I draft non entrano automaticamente in
+`contents/`: l'agente li revisiona e li converte seguendo le regole del sito.
+`inbox fetch --dry-run` verifica solo gli oggetti senza scrivere o scaricare
+allegati. Limiti e codici di uscita sono descritti nel README e nell'help.
+
 ## 8. Collaborazione e pubblicazione
 
 Condivisione e pubblicazione hanno scopi diversi. Git può conservare e scambiare sorgenti, guide e modifiche del sito; l'hosting serve invece la versione pubblica.
@@ -329,6 +359,7 @@ Come percorso di collaborazione resta proposto: rami di lavoro, pull request, re
 | Inizializzazione del sito minimo | Implementata. |
 | Validazione e generazione deterministica | Implementate, secondo il contratto del sito. |
 | Importazione HTTP e acquisizione browser | Implementate con i limiti documentati. |
+| Acquisizione di bozze Markdown via posta | `inbox configure` e `inbox fetch`: IMAP TLS, filtro per `site.id`, file separati dai sorgenti, deduplicazione per casella e UID. |
 | Tre guide esterne copiate da `init` | Implementate nel codice locale; distribuzione da verificare nella release utilizzata. |
 | Aggiornamento delle istruzioni dei siti già inizializzati | `websmith update` sostituisce le tre basi e conserva i `.local.md`; propone separatamente gli aggiornamenti ai punti di ingresso personalizzati. |
 | Catalogo centrale e download guidato dei siti | Non implementati. |
