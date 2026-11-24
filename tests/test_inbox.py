@@ -83,7 +83,7 @@ class InboxTests(unittest.TestCase):
     def write_settings(self):
         path = self.root / inbox.CONFIG_PATH
         path.parent.mkdir(exist_ok=True)
-        path.write_text(json.dumps(self.settings))
+        path.write_text(json.dumps(self.settings), encoding='utf-8')
 
     def fetch(self, box, **overrides):
         args = SimpleNamespace(**(vars(self.args) | overrides))
@@ -109,10 +109,10 @@ class InboxTests(unittest.TestCase):
         self.assertEqual(bodies, ['1'])
         files = list((self.root / 'drafts').rglob('*.md'))
         self.assertEqual(len(files), 1)
-        self.assertEqual(files[0].read_text(), '# Caffè\n\nTesto.')
-        files[0].write_text('Modifica editoriale locale')
+        self.assertEqual(files[0].read_text(encoding='utf-8'), '# Caffè\n\nTesto.')
+        files[0].write_text('Modifica editoriale locale', encoding='utf-8')
         self.assertEqual(self.fetch(box)[0], 0)
-        self.assertEqual(files[0].read_text(), 'Modifica editoriale locale')
+        self.assertEqual(files[0].read_text(encoding='utf-8'), 'Modifica editoriale locale')
         self.assertEqual(len(list((self.root / 'drafts').rglob('*.md'))), 1)
         self.assertTrue(box.logged_out)
         self.assertNotIn('not-a-real-secret', output)
@@ -123,7 +123,7 @@ class InboxTests(unittest.TestCase):
         other.mkdir()
         make_site(other)
         (other / '.websmith').mkdir()
-        (other / inbox.CONFIG_PATH).write_text(json.dumps(self.settings))
+        (other / inbox.CONFIG_PATH).write_text(json.dumps(self.settings), encoding='utf-8')
         with patch.object(inbox.imaplib, 'IMAP4_SSL', return_value=Mailbox({'1': mail()})), contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(inbox.fetch(other, 'example', self.args), 0)
         self.assertEqual(len(list((other / 'drafts').rglob('*.md'))), 1)
@@ -147,7 +147,7 @@ class InboxTests(unittest.TestCase):
         self.assertEqual(self.fetch(box)[0], 0)
         files = list((self.root / 'drafts').rglob('*.md'))
         self.assertEqual(len(files), 4)
-        self.assertEqual({path.read_text() for path in files}, {'first', 'second', 'third', 'fourth'})
+        self.assertEqual({path.read_text(encoding='utf-8') for path in files}, {'first', 'second', 'third', 'fourth'})
         self.assertFalse((self.root / 'escape.md').exists())
         self.assertFalse(list((self.root / 'drafts').rglob('*.sh')))
 
@@ -157,13 +157,13 @@ class InboxTests(unittest.TestCase):
         message.set_content('# È una bozza', subtype='markdown')
         self.assertEqual(self.fetch(Mailbox({'1': message.as_bytes()}))[0], 0)
         files = list((self.root / 'drafts').rglob('*.md'))
-        self.assertIn('# È una bozza', files[0].read_text())
+        self.assertIn('# È una bozza', files[0].read_text(encoding='utf-8'))
         other = EmailMessage()
         other['Subject'] = '[websmith:example] Charset'
         other.set_content('Testo allegato')
         other.add_attachment('Caffè', subtype='markdown', charset='iso-8859-1', filename='test.markdown')
         self.assertEqual(self.fetch(Mailbox({'2': other.as_bytes()}))[0], 0)
-        self.assertIn('Caffè', next((self.root / 'drafts').rglob('*test.md')).read_text())
+        self.assertIn('Caffè', next((self.root / 'drafts').rglob('*test.md')).read_text(encoding='utf-8'))
 
     def test_oversized_and_broken_attachment_are_retried_without_partial_files(self):
         box = Mailbox({'1': mail()})
@@ -192,7 +192,7 @@ class InboxTests(unittest.TestCase):
     def test_invalid_config_and_missing_password_do_not_connect(self):
         for change in ({'site_id': 'other'}, {'port': 0}, {'host': 'https://imap.example.test'},
                        {'folder': 'INBOX\r\nLOGOUT'}, {'password': 'secret'}):
-            (self.root / inbox.CONFIG_PATH).write_text(json.dumps(self.settings | change))
+            (self.root / inbox.CONFIG_PATH).write_text(json.dumps(self.settings | change), encoding='utf-8')
             with patch.object(inbox.imaplib, 'IMAP4_SSL') as connect:
                 with self.assertRaises(ValueError):
                     inbox.fetch(self.root, 'example', self.args)
@@ -230,7 +230,7 @@ class InboxTests(unittest.TestCase):
                                  '--host', 'new.example.test', '--username', 'new@example.test'],
                                 cwd=self.root / 'contents/en', text=True, capture_output=True)
         self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
-        data = json.loads((self.root / inbox.CONFIG_PATH).read_text())
+        data = json.loads((self.root / inbox.CONFIG_PATH).read_text(encoding='utf-8'))
         self.assertEqual(data['host'], 'new.example.test')
         self.assertEqual(data['site_id'], 'example')
         self.assertNotIn('password', data)
@@ -238,7 +238,7 @@ class InboxTests(unittest.TestCase):
             self.assertEqual((self.root / inbox.CONFIG_PATH).stat().st_mode & 0o777, 0o600)
         # Reconfiguration can explicitly rebind a copied site's inbox settings.
         data['site_id'] = 'old-site'
-        (self.root / inbox.CONFIG_PATH).write_text(json.dumps(data))
+        (self.root / inbox.CONFIG_PATH).write_text(json.dumps(data), encoding='utf-8')
         args = engine.build_parser().parse_args(['inbox', 'configure', '--host', 'new.example.test', '--username', 'new@example.test'])
         with patch.object(sys.stdin, 'isatty', return_value=False), contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(inbox.configure(self.root, 'example', args), 0)

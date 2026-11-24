@@ -2,7 +2,7 @@ name: Build standalone engines
 on:
   workflow_dispatch:
   push:
-    paths: ['src/**', '!src/websmith/resources/**/*.md', 'pyproject.toml', 'setup.sh', 'scripts/build-native.py', 'scripts/package-native.py', '.github/workflows/native.yml']
+    paths: ['src/**', '!src/websmith/resources/**/*.md', 'tests/**', 'pyproject.toml', 'setup.sh', 'scripts/build-native.py', 'scripts/package-native.py', '.github/workflows/native.yml']
 permissions:
   contents: read
 jobs:
