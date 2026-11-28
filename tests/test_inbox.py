@@ -18,11 +18,15 @@ from websmith import engine, inbox
 from test_package import make_site
 
 
-def mail(subject='[websmith:example] Bozza', attachments=None):
+def mail(subject='[websmith:example] Bozza', attachments=None, recipient=None, cc=None):
     message = EmailMessage()
     message['Subject'] = subject
     message['From'] = 'writer@example.test'
     message['Message-ID'] = '<draft@example.test>'
+    if recipient is not None:
+        message['To'] = recipient
+    if cc is not None:
+        message['Cc'] = cc
     message.set_content('Bozza in allegato.')
     for filename, payload in (attachments if attachments is not None else [('story.md', '# Caffè\n\nTesto.'.encode())]):
         message.add_attachment(payload, maintype='text', subtype='markdown', filename=filename)
@@ -191,7 +195,10 @@ class InboxTests(unittest.TestCase):
 
     def test_invalid_config_and_missing_password_do_not_connect(self):
         for change in ({'site_id': 'other'}, {'port': 0}, {'host': 'https://imap.example.test'},
-                       {'folder': 'INBOX\r\nLOGOUT'}, {'password': 'secret'}):
+                       {'folder': 'INBOX\r\nLOGOUT'}, {'password': 'secret'},
+                       {'recipient': 'bad@example.test\r\nLOGOUT'}, {'recipient': ['bad@example.test']},
+                       {'recipient': 'one@example.test,two@example.test'},
+                       {'username': inbox.TECHRELOADED_ADDRESS, 'recipient': 'other@example.test'}):
             (self.root / inbox.CONFIG_PATH).write_text(json.dumps(self.settings | change), encoding='utf-8')
             with patch.object(inbox.imaplib, 'IMAP4_SSL') as connect:
                 with self.assertRaises(ValueError):
@@ -243,6 +250,91 @@ class InboxTests(unittest.TestCase):
         with patch.object(sys.stdin, 'isatty', return_value=False), contextlib.redirect_stdout(io.StringIO()):
             self.assertEqual(inbox.configure(self.root, 'example', args), 0)
         self.assertEqual(inbox.read_settings(self.root, 'example')['site_id'], 'example')
+
+    def test_techreloaded_profile_configures_mailbox_for_current_site(self):
+        result = subprocess.run([sys.executable, '-m', 'websmith', 'inbox', 'configure',
+                                 '--profile', 'techreloaded'],
+                                cwd=self.root, text=True, capture_output=True)
+        self.assertEqual(result.returncode, 0, result.stdout + result.stderr)
+        data = inbox.read_settings(self.root, 'example')
+        self.assertEqual(data['site_id'], 'example')
+        self.assertEqual(data['host'], 'mail.techreloaded.it')
+        self.assertEqual(data['port'], 993)
+        self.assertEqual(data['username'], inbox.TECHRELOADED_ADDRESS)
+        self.assertEqual(data['recipient'], inbox.TECHRELOADED_ADDRESS)
+        self.assertNotIn('password', data)
+        self.assertNotIn('not-a-real-secret', (self.root / inbox.CONFIG_PATH).read_text())
+
+    def test_new_sites_use_the_same_shared_mailbox_by_default(self):
+        args = engine.build_parser().parse_args(['inbox', 'configure'])
+        for site_id in ('techreloaded', 'another-site'):
+            (self.root / inbox.CONFIG_PATH).unlink()
+            with patch.object(sys.stdin, 'isatty', return_value=False), contextlib.redirect_stdout(io.StringIO()):
+                self.assertEqual(inbox.configure(self.root, site_id, args), 0)
+            data = inbox.read_settings(self.root, site_id)
+            self.assertEqual(data['site_id'], site_id)
+            self.assertEqual(data['host'], 'mail.techreloaded.it')
+            self.assertEqual(data['port'], 993)
+            self.assertEqual(data['username'], inbox.TECHRELOADED_ADDRESS)
+            self.assertEqual(data['recipient'], inbox.TECHRELOADED_ADDRESS)
+        self.assertEqual(inbox.PROFILES['shared'], inbox.PROFILES['techreloaded'])
+
+    def test_recipient_filter_searches_and_checks_headers_before_reading_bodies(self):
+        address = inbox.TECHRELOADED_ADDRESS
+        # Older configurations of this mailbox must enforce the same filter.
+        self.settings.update(host='mail.techreloaded.it', username=address)
+        self.write_settings()
+        box = Mailbox({
+            '1': mail(recipient=f'TechReloaded <{address}>'),
+            '2': mail(recipient='personal@example.test'),
+            '3': mail(recipient='trtalks@techreloaded.it.other.test'),
+            '4': mail(recipient=f'{address}.invalid'),
+            '5': mail(),
+            '6': mail('[websmith:other] Altro', recipient=address),
+            '7': mail('[websmith:example] [websmith:other] Ambiguo', recipient=address),
+            '8': mail(recipient='other@example.test', cc=address.upper()),
+            '9': mail(recipient=f'"{address}" <personal@example.test>'),
+        })
+        code, output, factory = self.fetch(box)
+        self.assertEqual(code, 0, output)
+        factory.assert_called_once()
+        self.assertEqual(box.credentials[0], address)
+        self.assertIn(('SEARCH', None, 'SUBJECT', '"[websmith:example]"',
+                       'OR', 'TO', f'"{address}"', 'CC', f'"{address}"'), box.calls)
+        bodies = [call[1] for call in box.calls if call[0] == 'FETCH' and 'BODY.PEEK[]' in call[2]]
+        self.assertEqual(bodies, ['1', '8'])
+        self.assertTrue(all('(SUBJECT TO CC)' in call[2] for call in box.calls
+                            if call[0] == 'FETCH' and 'HEADER.FIELDS' in call[2]))
+        self.assertEqual(len(list((self.root / 'drafts').rglob('*.md'))), 2)
+        self.assertTrue(box.logged_out)
+
+    def test_recipient_filter_applies_to_dry_run_without_reading_bodies(self):
+        self.settings['recipient'] = inbox.TECHRELOADED_ADDRESS
+        self.write_settings()
+        box = Mailbox({'1': mail(recipient=inbox.TECHRELOADED_ADDRESS),
+                       '2': mail(recipient='other@example.test')})
+        code, output, _ = self.fetch(box, dry_run=True)
+        self.assertEqual(code, 0, output)
+        self.assertIn('Da esaminare: 1.', output)
+        self.assertFalse(any('BODY.PEEK[]' in call[-1] for call in box.calls))
+        self.assertFalse((self.root / 'drafts').exists())
+
+    def test_recipient_is_rechecked_after_body_download(self):
+        self.settings['recipient'] = inbox.TECHRELOADED_ADDRESS
+        self.write_settings()
+
+        class ChangedRecipient(Mailbox):
+            def uid(self, operation, *args):
+                if operation == 'FETCH' and 'BODY.PEEK[]' in args[1]:
+                    self.messages[args[0]] = mail(recipient='another@techreloaded.it')
+                return super().uid(operation, *args)
+
+        # Equal lengths ensure this tests recipient validation, not size checks.
+        box = ChangedRecipient({'1': mail(recipient=inbox.TECHRELOADED_ADDRESS)})
+        code, output, _ = self.fetch(box)
+        self.assertEqual(code, 1, output)
+        self.assertIn('non corrisponde al sito o al destinatario', output)
+        self.assertFalse((self.root / 'drafts').exists())
 
     @unittest.skipIf(os.name == 'nt', 'Symlink permissions differ on Windows')
     def test_symlinked_download_path_is_rejected_before_connecting(self):

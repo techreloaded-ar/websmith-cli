@@ -16,11 +16,19 @@ import tempfile
 from email import policy
 from email.errors import MessageError
 from email.parser import BytesParser
+from email.utils import getaddresses
 
 import certifi
 
 CONFIG_PATH = '.websmith/inbox.json'
 DEFAULT_PASSWORD_ENV = 'WEBSMITH_MAIL_PASSWORD'
+TECHRELOADED_ADDRESS = 'trtalks@techreloaded.it'
+SHARED_MAILBOX = dict(host='mail.techreloaded.it', port=993,
+                      username=TECHRELOADED_ADDRESS, recipient=TECHRELOADED_ADDRESS)
+PROFILES = {
+    'shared': SHARED_MAILBOX,
+    'techreloaded': SHARED_MAILBOX,  # Compatibility alias; not a site-specific account.
+}
 SITE_TAG = re.compile(r'\[websmith:([^\]\r\n]+)\]', re.IGNORECASE)
 
 
@@ -40,7 +48,7 @@ def local_path(root: Path, relative: str) -> Path:
 
 def validate_settings(data: dict, site_id: str) -> dict:
     fields = {'version', 'site_id', 'host', 'port', 'username', 'folder', 'password_env'}
-    if not isinstance(data, dict) or set(data) != fields or data.get('version') != 1:
+    if not isinstance(data, dict) or not fields <= set(data) or set(data) - fields - {'recipient'} or data.get('version') != 1:
         raise ValueError('Configurazione inbox non valida: eseguire inbox configure. Non salvare password nel file.')
     if data['site_id'] != site_id:
         raise ValueError('La configurazione inbox appartiene a un altro sito: eseguire inbox configure.')
@@ -56,6 +64,14 @@ def validate_settings(data: dict, site_id: str) -> dict:
         raise ValueError('Usare un nome cartella IMAP ASCII (o codificato in modified UTF-7).')
     if not re.fullmatch(r'[A-Za-z_][A-Za-z0-9_]*', data['password_env']):
         raise ValueError('Nome della variabile per la password non valido.')
+    recipient = data.get('recipient', '')
+    if not isinstance(recipient, str) or (recipient and not re.fullmatch(
+        r"[A-Za-z0-9.!#$%&'*+/=?^_`{|}~-]+@[A-Za-z0-9](?:[A-Za-z0-9.-]*[A-Za-z0-9])?", recipient
+    )):
+        raise ValueError('Destinatario inbox non valido: indicare un solo indirizzo email.')
+    # Enforce the recipient restriction also for older TechReloaded settings.
+    if data['username'].lower() == TECHRELOADED_ADDRESS and recipient.lower() not in ('', TECHRELOADED_ADDRESS):
+        raise ValueError(f'La casella {TECHRELOADED_ADDRESS} richiede lo stesso destinatario.')
     return data
 
 
@@ -73,12 +89,13 @@ def read_settings(root: Path, site_id: str, *, rebind: bool = False) -> dict:
 def configure(root: Path, site_id: str, args) -> int:
     path = local_path(root, CONFIG_PATH)
     previous = read_settings(root, site_id, rebind=True) if path.exists() else {}
+    profile = PROFILES.get(getattr(args, 'profile', None), {})
 
     def setting(name, label, default=None):
-        supplied = getattr(args, name)
+        supplied = getattr(args, name, None)
         if supplied is not None:
             return supplied
-        value = previous.get(name, default)
+        value = profile.get(name, previous.get(name, default))
         if sys.stdin.isatty():
             entered = input(f'{label}' + (f' [{value}]' if value is not None else '') + ': ').strip()
             return entered or value
@@ -91,10 +108,12 @@ def configure(root: Path, site_id: str, args) -> int:
         port = int(port)
     except (TypeError, ValueError):
         raise ValueError('Porta IMAP non valida.') from None
+    username = setting('username', 'Username', SHARED_MAILBOX['username'])
     data = validate_settings(dict(
         version=1, site_id=site_id,
-        host=setting('host', 'Server IMAP'), port=port,
-        username=setting('username', 'Username'),
+        host=setting('host', 'Server IMAP', SHARED_MAILBOX['host']), port=port,
+        username=username,
+        recipient=setting('recipient', 'Destinatario da filtrare', username if '@' in username else ''),
         folder=setting('folder', 'Cartella', 'INBOX'),
         password_env=setting('password_env', 'Variabile password', DEFAULT_PASSWORD_ENV),
     ), site_id)
@@ -108,6 +127,7 @@ def configure(root: Path, site_id: str, args) -> int:
     finally:
         Path(name).unlink(missing_ok=True)
     print(f'Casella configurata per {site_id}. Oggetto richiesto: [websmith:{site_id}]')
+    print(f"IMAP TLS: {data['host']}:{data['port']}; account: {data['username']}; destinatario: {recipient_for(data) or 'non impostato'}.")
     print('La password non viene salvata; verrà letta dalla variabile configurata o richiesta al download.')
     return 0
 
@@ -144,6 +164,19 @@ def literal(data, maximum: int) -> tuple[bytes, bytes]:
 def belongs_to_site(message, site_id: str) -> bool:
     subjects = message.get_all('Subject', [])
     return len(subjects) == 1 and SITE_TAG.findall(str(subjects[0]).lower()) == [site_id]
+
+
+def recipient_for(settings: dict) -> str:
+    if settings['username'].lower() == TECHRELOADED_ADDRESS:
+        return TECHRELOADED_ADDRESS
+    return settings.get('recipient', '').lower()
+
+
+def addressed_to(message, recipient: str) -> bool:
+    if not recipient:
+        return True  # Legacy configurations without a recipient filter.
+    headers = [str(value) for name in ('To', 'Cc') for value in message.get_all(name, [])]
+    return any(address.lower() == recipient for _, address in getaddresses(headers))
 
 
 def markdown_files(message) -> list[tuple[str, bytes]]:
@@ -199,6 +232,7 @@ def save_message(root: Path, relative: str, files: list[tuple[str, bytes]], meta
 
 def fetch(root: Path, site_id: str, args) -> int:
     settings = read_settings(root, site_id)
+    recipient = recipient_for(settings)
     if args.limit < 1 or args.max_message_bytes < 1 or not math.isfinite(args.timeout) or args.timeout <= 0:
         raise ValueError('Limiti e timeout devono essere positivi e finiti.')
     # Validate output before connecting, even when no message will be saved.
@@ -221,7 +255,10 @@ def fetch(root: Path, site_id: str, args) -> int:
         if not validity_data or not isinstance(validity_data[0], bytes) or not re.fullmatch(rb'[1-9][0-9]*', validity_data[0]):
             raise ValueError('UIDVALIDITY mancante o non valida: download interrotto per evitare duplicati.')
         validity = validity_data[0].decode('ascii')
-        results = checked(connection.uid('SEARCH', None, 'SUBJECT', quote(f'[websmith:{site_id}]')), 'ricerca per sito')
+        criteria = ['SUBJECT', quote(f'[websmith:{site_id}]')]
+        if recipient:
+            criteria.extend(['OR', 'TO', quote(recipient), 'CC', quote(recipient)])
+        results = checked(connection.uid('SEARCH', None, *criteria), 'ricerca per sito e destinatario')
         uids = b' '.join(item for item in results if isinstance(item, bytes)).split()
         if any(not re.fullmatch(rb'[1-9][0-9]*', uid) for uid in uids):
             raise ValueError('Identificativi IMAP non validi.')
@@ -238,9 +275,10 @@ def fetch(root: Path, site_id: str, args) -> int:
                 print('Limite per esecuzione raggiunto; ripetere inbox fetch per continuare.')
                 break
             try:
-                headers = checked(connection.uid('FETCH', uid, '(UID RFC822.SIZE BODY.PEEK[HEADER.FIELDS (SUBJECT)])'), 'lettura oggetto')
+                headers = checked(connection.uid('FETCH', uid, '(UID RFC822.SIZE BODY.PEEK[HEADER.FIELDS (SUBJECT TO CC)])'), 'lettura intestazioni')
                 response, header = literal(headers, 65536)
-                if not belongs_to_site(BytesParser(policy=policy.default).parsebytes(header), site_id):
+                message_headers = BytesParser(policy=policy.default).parsebytes(header)
+                if not belongs_to_site(message_headers, site_id) or not addressed_to(message_headers, recipient):
                     ignored += 1
                     continue
                 size_match = re.search(rb'RFC822.SIZE\s+(\d+)', response)
@@ -256,8 +294,8 @@ def fetch(root: Path, site_id: str, args) -> int:
                 if len(raw) != size:
                     raise ValueError('Download del messaggio incompleto.')
                 message = BytesParser(policy=policy.default).parsebytes(raw)
-                if not belongs_to_site(message, site_id):
-                    raise ValueError('Il messaggio scaricato non corrisponde al sito.')
+                if not belongs_to_site(message, site_id) or not addressed_to(message, recipient):
+                    raise ValueError('Il messaggio scaricato non corrisponde al sito o al destinatario.')
                 files = markdown_files(message)
                 if not files:
                     ignored += 1
@@ -265,6 +303,7 @@ def fetch(root: Path, site_id: str, args) -> int:
                     continue
                 save_message(root, relative, files, dict(
                     site_id=site_id, uid=uid, uidvalidity=validity,
+                    recipient=recipient,
                     message_id=str(message.get('Message-ID', '')),
                     subject=str(message.get('Subject', '')), sender=str(message.get('From', '')),
                     date=str(message.get('Date', '')), files=[name for name, _ in files],
@@ -310,9 +349,11 @@ def add_parser(subparsers):
     parser.set_defaults(site=None)
     actions = parser.add_subparsers(dest='inbox_action', required=True)
     setup = actions.add_parser('configure', help='Imposta server IMAP TLS e username per questo sito, senza salvare la password')
+    setup.add_argument('--profile', choices=sorted(PROFILES), help='Parametri precompilati della casella; site.id resta quello del sito corrente')
     setup.add_argument('--host', help='Server IMAP TLS, senza schema URL')
     setup.add_argument('--port', type=int, help='Porta TLS; predefinita 993')
     setup.add_argument('--username', help='Username della casella')
+    setup.add_argument('--recipient', help='Destinatario esatto in To o Cc; predefinito lo username se è un indirizzo email')
     setup.add_argument('--folder', help='Cartella IMAP; predefinita INBOX')
     setup.add_argument('--password-env', help=f'Variabile da cui leggere la password; predefinita {DEFAULT_PASSWORD_ENV}')
     setup.set_defaults(func=command_inbox)
@@ -320,5 +361,5 @@ def add_parser(subparsers):
     download.add_argument('--limit', type=int, default=50, help='Massimo messaggi salvati, segnalati con errore o elencati in dry-run; predefinito 50')
     download.add_argument('--max-message-bytes', type=int, default=10_000_000, help='Dimensione massima di una email; predefinita 10 MB')
     download.add_argument('--timeout', type=float, default=30, help='Timeout connessione in secondi; predefinito 30')
-    download.add_argument('--dry-run', action='store_true', help='Controlla solo gli oggetti dei messaggi nuovi, senza scaricare allegati o scrivere file')
+    download.add_argument('--dry-run', action='store_true', help='Controlla oggetti e destinatari dei messaggi nuovi, senza scaricare allegati o scrivere file')
     download.set_defaults(func=command_inbox)

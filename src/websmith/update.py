@@ -10,7 +10,7 @@ from pathlib import Path
 import tempfile
 
 from . import __version__
-from .initialize import BASE_GUIDES, agent_files
+from .initialize import BASE_GUIDES, MANAGED_GUIDES, agent_files
 
 
 def digest(data: bytes) -> str:
@@ -141,8 +141,8 @@ def command_update(args) -> int:
             if current == desired:
                 inventory[name] = digest(desired)
                 messages.append(f'Già aggiornato: {name}')
-            elif name in BASE_GUIDES or current is None or (expected is not None and digest(current) == expected):
-                if name in BASE_GUIDES and current is not None:
+            elif name in MANAGED_GUIDES or current is None or (expected is not None and digest(current) == expected):
+                if name in MANAGED_GUIDES and current is not None:
                     # Preserve previous bytes for recovery; these are not active overrides.
                     backup = f'.websmith/update-backups/{__version__}/{digest(current)}/{name}'
                     backup_path = checked_path(root, backup)

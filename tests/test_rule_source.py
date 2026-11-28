@@ -15,7 +15,7 @@ class RuleSourceTests(unittest.TestCase):
         stream = io.BytesIO()
         with zipfile.ZipFile(stream, 'w') as archive:
             for name, text in files.items():
-                archive.writestr(f'websmith-cli-{revision}/src/websmith/resources/{name}', text)
+                archive.writestr(f'websmith-cli-{revision}/{rule_source.SOURCE_PATHS[name]}', text)
         return stream.getvalue()
 
     def test_commit_pinning_cache_and_offline(self):
@@ -38,7 +38,7 @@ class RuleSourceTests(unittest.TestCase):
             for missing in [False, True]:
                 source = dict(files)
                 if missing:
-                    source.pop('rules/EDITORIAL_RULES.md')
+                    source.pop('skills/editor/references/EDITORIAL_RULES.md')
                 with patch.object(rule_source, 'download', side_effect=[json.dumps({'sha': revision}).encode(), self.archive(revision, source)]):
                     if missing:
                         with self.assertRaises(ValueError):
@@ -51,7 +51,7 @@ class RuleSourceTests(unittest.TestCase):
         from websmith.initialize import agent_files, install_files, starter
         from websmith.update import command_update
         from websmith import __version__
-        resources = {name: (Path(__file__).parents[1] / 'src/websmith/resources' / name).read_text(encoding='utf-8') for name in rule_source.FILES}
+        resources = rule_source.local_files(Path(__file__).parents[1])
         with tempfile.TemporaryDirectory() as folder:
             root = Path(folder)
             files = agent_files('none', resources)
@@ -60,7 +60,7 @@ class RuleSourceTests(unittest.TestCase):
             files['.websmith/installed-files.json'] = '{}'
             files['TONE_OF_VOICE.local.md'] = 'Keep my voice\n'
             install_files(root, files)
-            resources['rules/EDITORIAL_RULES.md'] = '# New rules without a binary release\n'
+            resources['skills/editor/references/EDITORIAL_RULES.md'] = '# New rules without a binary release\n'
             args = SimpleNamespace(site_root=root, offline=False, dry_run=True)
             with patch('websmith.self_update.update_program', return_value=None), patch.object(rule_source, 'load', return_value=(resources, 'c' * 40)) as load:
                 before = {p: p.read_bytes() for p in root.rglob('*') if p.is_file()}
@@ -69,6 +69,7 @@ class RuleSourceTests(unittest.TestCase):
                 self.assertEqual(before, {p: p.read_bytes() for p in root.rglob('*') if p.is_file()})
                 args.dry_run = False
                 self.assertEqual(command_update(args), 0)
-            self.assertEqual((root / 'EDITORIAL_RULES.md').read_text(), resources['rules/EDITORIAL_RULES.md'])
+            self.assertEqual((root / 'EDITORIAL_RULES.md').read_text(), resources['skills/editor/references/EDITORIAL_RULES.md'])
+            self.assertEqual((root / 'skills/editor/references/EDITORIAL_RULES.md').read_bytes(), (root / 'EDITORIAL_RULES.md').read_bytes())
             self.assertEqual((root / 'TONE_OF_VOICE.local.md').read_text(), 'Keep my voice\n')
             self.assertEqual(json.loads((root / '.websmith/project.json').read_text())['instructions_revision'], 'c' * 40)

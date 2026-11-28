@@ -112,10 +112,11 @@ Prepara un manifest, una homepage Markdown, template, un componente di esempio, 
 | Percorso iniziale | Contenuto |
 | --- | --- |
 | `websmith.yaml` | Lingue, percorsi, template, asset, routing e altre impostazioni operative. |
-| `AGENTS.md` | Punto di ingresso per l'agente e riferimenti alle tre guide. |
-| `COMPOSITION_GUIDE.md` | Regole tecniche di composizione e generazione. |
-| `TONE_OF_VOICE.md` | Parametri di voce, pubblico e lessico. |
-| `EDITORIAL_RULES.md` | Regole per revisionare i testi e parametri editoriali. |
+| `AGENTS.md` | Coordinamento e scelta delle skill. |
+| `skills/` | Skill editor, composer, tov e mail, con regole e strumenti dedicati. |
+| `COMPOSITION_GUIDE.md` | Copia di compatibilità della guida nella skill composer. |
+| `TONE_OF_VOICE.md` | Copia di compatibilità dei parametri nella skill tov. |
+| `EDITORIAL_RULES.md` | Copia di compatibilità delle regole nella skill editor. |
 | `contents/<lingua>/pages/home.md` | Contenuto e front matter della homepage. |
 | `templates/html/` | Template delle pagine e della pagina di ingresso alle lingue. |
 | `templates/html/components/` | Template e catalogo dei componenti del sito. |
@@ -137,21 +138,44 @@ I template definiscono la struttura HTML. Gli attributi `data-websmith-*` indica
 
 Dati editoriali senza destinazione dichiarata, riferimenti irrisolti o input ambigui possono bloccare la generazione: non vanno aggirati modificando soltanto l'HTML prodotto.
 
-## 4. I tre file di regole
+## 4. Skill e regole
 
-I modelli originali si trovano in `src/websmith/resources/rules/` e sono distribuiti separatamente dal programma. Durante `init` vengono copiati nella radice del sito. Non sono testi incorporati in `initialize.py`: il codice legge i file e gestisce l'installazione.
+Le regole originali si trovano nelle cartelle `references/` delle rispettive
+skill e sono distribuite separatamente dal programma. `init` installa le skill
+nel sito, insieme alle copie di compatibilità delle guide nella radice.
+Il codice gestisce distribuzione e installazione senza incorporare le regole.
 
 | Documento | Ambito |
 | --- | --- |
 | `COMPOSITION_GUIDE.md` | Sorgenti autorevoli, rendering, uso di template e componenti grafici, front matter tecnico, asset, traduzioni, validazione e verifica dell'output. |
 | `TONE_OF_VOICE.md` | Pubblico, scopo, persona narrativa, registro, lessico di settore e testi di riferimento. |
-| `EDITORIAL_RULES.md` | Fedeltà alla fonte, riformulazioni, tagli, citazioni, precisione dei numeri, spiegazioni con ndr, note alla redazione e parametri di formato e contenuto. |
+| `EDITORIAL_RULES.md` | Fedeltà alla fonte, riformulazioni, tagli, citazioni, precisione dei numeri, note alla redazione e parametri di formato e contenuto. |
 
 I modelli di `TONE_OF_VOICE.md` ed `EDITORIAL_RULES.md` derivano esclusivamente da `linee-guida-agente-editor.md`, comprese le modifiche approvate. Le proposte per TechReloaded Stories sono conservate come esempi da confermare: non diventano impostazioni attive per ogni sito.
 
 Le basi sono aggiornate da Websmith; le personalizzazioni appartengono ai file `.local.md` facoltativi del sito. I parametri non compilati non equivalgono a preferenze approvate. I limiti della revisione editoriale riguardano il lavoro su testi già scritti; non trasformano il renderer in un editor.
 
-Anche i modelli di `AGENTS.md`, `CLAUDE.md` e delle istruzioni operative Codex/Claude sono file esterni. Per Codex viene creata `.agents/skills/websmith-site/SKILL.md`; per Claude vengono creati `CLAUDE.md` e `.claude/skills/websmith-site/SKILL.md`. Questi riferimenti indirizzano l'agente ad `AGENTS.md`.
+Le istruzioni autorevoli sono organizzate nel repository in `skills/editor/`,
+`skills/composer/`, `skills/tov/` e `skills/mail/`. Ogni skill contiene `SKILL.md`
+e gli eventuali `references/` e `scripts/`. I modelli di ingresso sono in
+`agent-config/`. Le regole appartengono alla skill responsabile: le altre le
+richiamano senza mantenerne copie manuali.
+
+Nei siti vengono installate le stesse cartelle `skills/`. Codex le scopre tramite
+brevi punti di ingresso sotto `.agents/skills/`; Claude tramite `.claude/skills/`
+e `CLAUDE.md`. Le procedure restano solo nelle skill centrali. `websmith-site`
+continua a indirizzare ad `AGENTS.md` per compatibilità. Con agente `none` vengono
+installate le skill, senza i punti di ingresso specifici di Codex o Claude.
+
+Le guide nella radice sono copie di compatibilità derivate dalle regole delle
+skill; i file `.local.md` restano nella radice e conservano le personalizzazioni.
+Per composer vale anche l'eventuale guida diversa dichiarata dal manifest.
+
+Nel repository i vecchi percorsi sotto `src/websmith/resources/rules/` restano
+copie generate per gli eseguibili precedenti. Dopo una modifica alle sorgenti,
+eseguire `python3 scripts/sync-legacy-instructions.py`; `--check` controlla la
+coerenza senza scrivere. I vecchi eseguibili continuano a ricevere le guide,
+ma per installare le nuove skill occorre un programma che supporti il formato.
 
 Nei nuovi siti `.websmith/rules.md` non viene più creato. Il precedente `.websmith/rules.md`, se presente, resta inalterato. L’aggiornamento esplicito si esegue con `websmith update`; l’integrazione di personalizzazioni e vecchi riferimenti richiede comunque una revisione.
 
@@ -183,11 +207,15 @@ il comando richiede l'installazione della release; non sostituisce un interprete
 Python o un eseguibile Windows in uso.
 
 Dalla versione `0.1.0a9` le istruzioni Markdown sono distribuite separatamente dal
-programma: non sono incluse negli eseguibili. `init` e `update` scaricano i file
-in `src/websmith/resources/` dal ramo `main` di GitHub, fissando tutti i download
-alla stessa revisione. Un push delle regole su `main` basta per renderle disponibili:
-non occorre cambiare versione o ricompilare il programma. Il controllo delle release
-per l'eseguibile resta separato e non lo sostituisce a parità di versione.
+programma: non sono incluse negli eseguibili. `init` e `update` scaricano le
+istruzioni dal ramo `main` di GitHub, fissando tutti i file alla stessa revisione.
+Nel nuovo formato le sorgenti sono in `skills/` e `agent-config/`; la documentazione
+resta in `src/websmith/resources/docs/`. I percorsi precedenti sotto
+`src/websmith/resources/rules/` restano disponibili come copie generate.
+Un push delle regole su `main` le rende disponibili senza ricompilare il programma,
+se il formato è già supportato dall'eseguibile. Il passaggio al formato con skill
+richiede invece una release del programma con il nuovo codice di distribuzione.
+Il controllo delle release resta separato dall'aggiornamento delle istruzioni.
 
 `--dry-run` controlla la release e scarica le istruzioni per mostrare le differenze,
 senza sostituire l'eseguibile né scrivere nel sito o nella cache.
@@ -313,15 +341,28 @@ L'anteprima browser disattiva script, moduli e iframe. L'anteprima HTTP può anc
 
 ### Ricevere bozze da altri agenti tramite email
 
+Per la prova corrente dal prompt «c’è posta per me?» usare nella copia di sviluppo
+`.venv/bin/python scripts/check-mail.py --all-messages`. Legge tutta INBOX della
+sola casella condivisa, senza filtri `site.id`, e restituisce JSON con gli allegati
+di tutti i tipi. Il filtro per sito descritto sotto riguarda la CLI ed è previsto
+per una fase successiva del prompt.
+
 Il comando `websmith inbox` collega la cartella del sito a una casella IMAP TLS
 con username e password. La casella può servire più siti: il mittente deve
 includere nell'oggetto un solo tag `[websmith:IDENTIFICATIVO]` corrispondente al
 `site.id` del manifest. Siti distinti devono avere identificativi distinti.
 
 ```bash
-websmith inbox configure --host imap.esempio.it --username bozze@esempio.it
+websmith inbox configure --profile shared
 websmith inbox fetch
 ```
+
+Il profilo `shared` usa IMAP TLS su `mail.techreloaded.it:993`, account e
+destinatario `trtalks@techreloaded.it`. Il destinatario viene filtrato in To o Cc
+sul server e verificato esattamente prima del download e prima del salvataggio.
+La verifica del tag resta legata al `site.id` corrente, anche per siti diversi
+che condividono la casella. L'agente preferisce IMAP al connettore Gmail personale.
+Per altre caselle usare `--host`, `--username` e `--recipient`.
 
 La configurazione locale è in `.websmith/inbox.json`; la password viene richiesta
 al download oppure letta da `WEBSMITH_MAIL_PASSWORD`, senza salvarla nel progetto.
@@ -338,7 +379,7 @@ tag, ambigui o di altri siti sono esclusi prima del recupero del contenuto.
 Il server è usato in sola lettura: il download non cambia lo stato letto/non letto,
 non sposta e non cancella messaggi. I draft non entrano automaticamente in
 `contents/`: l'agente li revisiona e li converte seguendo le regole del sito.
-`inbox fetch --dry-run` verifica solo gli oggetti senza scrivere o scaricare
+`inbox fetch --dry-run` verifica solo oggetti e destinatari senza scrivere o scaricare
 allegati. Limiti e codici di uscita sono descritti nel README e nell'help.
 
 ## 8. Collaborazione e pubblicazione
@@ -359,7 +400,7 @@ Come percorso di collaborazione resta proposto: rami di lavoro, pull request, re
 | Inizializzazione del sito minimo | Implementata. |
 | Validazione e generazione deterministica | Implementate, secondo il contratto del sito. |
 | Importazione HTTP e acquisizione browser | Implementate con i limiti documentati. |
-| Acquisizione di bozze Markdown via posta | `inbox configure` e `inbox fetch`: IMAP TLS, filtro per `site.id`, file separati dai sorgenti, deduplicazione per casella e UID. |
+| Acquisizione di bozze Markdown via posta | `inbox configure` e `inbox fetch`: IMAP TLS, filtri per `site.id` e destinatario, file separati dai sorgenti, deduplicazione per casella e UID. |
 | Tre guide esterne copiate da `init` | Implementate nel codice locale; distribuzione da verificare nella release utilizzata. |
 | Aggiornamento delle istruzioni dei siti già inizializzati | `websmith update` sostituisce le tre basi e conserva i `.local.md`; propone separatamente gli aggiornamenti ai punti di ingresso personalizzati. |
 | Catalogo centrale e download guidato dei siti | Non implementati. |
@@ -384,8 +425,8 @@ La versione registrata nei metadati di inizializzazione indica il programma usat
 
 - [README: installazione, comandi e sviluppo](../README.md).
 - [Contratto tecnico Websmith](../src/websmith/resources/docs/WEBSMITH_CONTRACT.md).
-- [Modello di composizione](../src/websmith/resources/rules/COMPOSITION_GUIDE.md).
-- [Modello di tone of voice](../src/websmith/resources/rules/TONE_OF_VOICE.md).
-- [Modello di regole editoriali](../src/websmith/resources/rules/EDITORIAL_RULES.md).
+- [Modello di composizione](../skills/composer/references/COMPOSITION_GUIDE.md).
+- [Modello di tone of voice](../skills/tov/references/TONE_OF_VOICE.md).
+- [Modello di regole editoriali](../skills/editor/references/EDITORIAL_RULES.md).
 
 I modelli e il codice descrivono il comportamento corrente del repository. I requisiti ancora da verificare sono indicati nella sezione sullo stato attuale e sugli sviluppi previsti.

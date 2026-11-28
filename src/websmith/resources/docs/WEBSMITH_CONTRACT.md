@@ -138,10 +138,20 @@ It should explain where and how to make a change. It must not duplicate exact vi
 
 ## Agent instruction files
 
-The package owns Markdown originals in `resources/rules/`. Initialization copies
-`AGENTS.md`, `COMPOSITION_GUIDE.md`, `TONE_OF_VOICE.md`, and `EDITORIAL_RULES.md`
-into the site root, preserving existing files. Instruction text is not embedded
-in initialization code. Codex and Claude entry points refer to `AGENTS.md`.
+Authoritative instructions live in the repository's `skills/` and `agent-config/`.
+Each of `editor`, `composer`, `tov`, and `mail` owns a `SKILL.md` and its references
+or scripts. Initialization copies the skill bundles into the site's `skills/`
+and installs thin Codex/Claude discovery entries that refer to them. `AGENTS.md`
+routes work between skills. Existing files are preserved. Instruction text is
+not embedded in initialization code.
+
+`resources/rules/` contains generated compatibility projections for older
+executables. Regenerate them with `scripts/sync-legacy-instructions.py`; CI
+checks that they match their sources. Older download paths remain available.
+Root guide copies are derived from skill references to preserve existing
+manifests. Site `.local.md` files remain at the root; no configuration migration
+is performed. This distribution change requires updated program code to install
+the skill bundles; old executables continue to use compatibility guides.
 
 `COMPOSITION_GUIDE.md` governs rendering, templates, components, source ownership,
 translations, validation, and output verification. `TONE_OF_VOICE.md` governs
@@ -164,6 +174,9 @@ Other entry points still use installation hashes to preserve custom instructions
 with replacements proposed under `.websmith/update-proposals/REVISION/` when
 needed. Such proposals, especially AGENTS.md references, must be integrated
 explicitly. The legacy `.websmith/rules.md` file is preserved.
+Skill procedures, discovery entries, and agent entry points use hash comparisons
+and proposals when modified locally. Managed guide references use the same
+refresh-and-backup policy as root guide copies. No `.local.md` file is changed.
 `update --dry-run` writes nothing. By default, update checks published GitHub releases (including prereleases).
 A native macOS/Linux executable is replaced only by a strictly newer release,
 after SHA-256, startup, and version checks. Equal or newer local versions are
@@ -172,8 +185,9 @@ runs `update` to fetch site rules independently from GitHub. If that step fails,
 stays updated and the failure is reported for retry. Python and Windows installs
 currently require manual binary installation when a newer release is available.
 Markdown files are not embedded in native executables or Python wheels. Init and
-update fetch the allowlisted rules and documentation from main at one pinned
-commit. Rule-only pushes require no binary release. The commit is recorded as
+update fetch the allowlisted skills, rules, scripts, and documentation from main
+at one pinned commit. Rule-only pushes require no binary release when the format
+is already supported by the executable. The commit is recorded as
 instructions_revision in project.json. A complete snapshot is cached outside the
 executable. `init --offline` and `update --offline` use that snapshot (or checkout
 resources in development); first use requires a connection. Network errors stop

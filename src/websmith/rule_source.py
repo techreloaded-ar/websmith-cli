@@ -1,4 +1,4 @@
-"""Version-independent Markdown distribution, pinned to one GitHub commit."""
+"""External skill and instruction distribution, pinned to one GitHub commit."""
 from __future__ import annotations
 
 import hashlib
@@ -11,11 +11,24 @@ import tempfile
 import zipfile
 
 from .self_update import REPOSITORY, download
+from .instruction_bundle import SOURCE_PATHS
 
-FILES = tuple('rules/' + name for name in (
-    'AGENTS.md', 'COMPOSITION_GUIDE.md', 'TONE_OF_VOICE.md',
-    'EDITORIAL_RULES.md', 'CLAUDE.md', 'WEBSMITH_SITE_SKILL.md',
-)) + ('docs/HELP.md', 'docs/WEBSMITH_CONTRACT.md')
+FILES = tuple(SOURCE_PATHS)
+
+
+def local_files(root: Path) -> dict[str, str]:
+    """Read a repository or portable bundle, accepting the old dev env path."""
+    # Previous CI/dev configurations point at src/websmith/resources.
+    if root.parts[-3:] == ('src', 'websmith', 'resources') and (root.parents[2] / 'skills').is_dir():
+        root = root.parents[2]
+    files = {}
+    for name, source in SOURCE_PATHS.items():
+        path = root / source
+        if not path.is_file():
+            # A portable external bundle uses the logical distribution paths.
+            path = root / name
+        files[name] = path.read_text(encoding='utf-8')
+    return validate(files)
 
 
 def cache_root() -> Path:
@@ -24,9 +37,9 @@ def cache_root() -> Path:
 
 def validate(files: dict) -> dict[str, str]:
     if set(files) != set(FILES):
-        raise ValueError('Distribuzione Markdown incompleta o incompatibile.')
+        raise ValueError('Distribuzione delle istruzioni incompleta o incompatibile; eseguire update con la rete attiva per scaricare anche le skill.')
     if any(not isinstance(text, str) or not text.strip() or len(text.encode('utf-8')) > 1_000_000 for text in files.values()):
-        raise ValueError('File Markdown vuoto o troppo grande.')
+        raise ValueError('File delle istruzioni vuoto o troppo grande.')
     return files
 
 
@@ -42,9 +55,9 @@ def load(*, offline: bool = False, persist: bool = True) -> tuple[dict[str, str]
                 raise ValueError('Cache delle istruzioni non valida: eseguire update con la rete attiva.')
             return validate(snapshot['files']), snapshot['revision']
         else:
-            root = Path(__file__).parent / 'resources'
+            root = Path(__file__).resolve().parents[2]
         try:
-            files = {name: (root / name).read_text(encoding='utf-8') for name in FILES}
+            files = local_files(root)
         except OSError as exc:
             raise ValueError('Nessuna copia esterna delle istruzioni disponibile. Eseguire prima init o update con la connessione attiva.') from exc
         files = validate(files)
@@ -56,13 +69,13 @@ def load(*, offline: bool = False, persist: bool = True) -> tuple[dict[str, str]
     if not re.fullmatch('[a-f0-9]{40}', revision):
         raise ValueError('Revisione GitHub non valida.')
     payload = download(f'https://github.com/{REPOSITORY}/archive/{revision}.zip', 25_000_000)
-    prefix = f'websmith-cli-{revision}/src/websmith/resources/'
+    prefix = f'websmith-cli-{revision}/'
     with zipfile.ZipFile(io.BytesIO(payload)) as archive:
         files = {}
-        for name in FILES:
-            matches = [entry for entry in archive.infolist() if entry.filename == prefix + name]
+        for name, source in SOURCE_PATHS.items():
+            matches = [entry for entry in archive.infolist() if entry.filename == prefix + source]
             if len(matches) != 1 or matches[0].file_size > 1_000_000:
-                raise ValueError(f'File Markdown mancante o non valido: {name}')
+                raise ValueError(f'File delle istruzioni mancante o non valido: {name}')
             files[name] = archive.read(matches[0]).decode('utf-8')
     validate(files)
     if persist:

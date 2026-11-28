@@ -14,9 +14,10 @@ from urllib.parse import urlparse
 import yaml
 
 from . import __version__
+from .instruction_bundle import GUIDE_SOURCES, SKILL_FILES, SKILL_NAMES
 
-RULES_ROOT = Path(__file__).resolve().parent / 'resources' / 'rules'
 BASE_GUIDES = ('COMPOSITION_GUIDE.md', 'TONE_OF_VOICE.md', 'EDITORIAL_RULES.md')
+MANAGED_GUIDES = (*BASE_GUIDES, *GUIDE_SOURCES.values())
 
 
 def slug(value: str) -> str:
@@ -32,16 +33,24 @@ def agent_files(agent: str, resources: dict[str, str] | None = None) -> dict[str
     if resources is None:
         from .rule_source import load
         resources, _ = load(offline=True)
-    def rule_text(name):
-        return resources["rules/" + name]
-    files = {name: rule_text(name) for name in (
-        'AGENTS.md', 'COMPOSITION_GUIDE.md', 'TONE_OF_VOICE.md', 'EDITORIAL_RULES.md',
-    )}
-    if agent == 'codex':
-        files['.agents/skills/websmith-site/SKILL.md'] = rule_text('WEBSMITH_SITE_SKILL.md')
-    elif agent == 'claude':
-        files['CLAUDE.md'] = rule_text('CLAUDE.md')
-        files['.claude/skills/websmith-site/SKILL.md'] = rule_text('WEBSMITH_SITE_SKILL.md')
+    files = {'AGENTS.md': resources['agent-config/AGENTS.md']}
+    files.update({name: resources[name] for name in SKILL_FILES})
+    # Derived compatibility copies preserve existing manifests and old prompts.
+    files.update({name: resources[source] for name, source in GUIDE_SOURCES.items()})
+    if agent in {'codex', 'claude'}:
+        directory = '.agents' if agent == 'codex' else '.claude'
+        if agent == 'claude':
+            files['CLAUDE.md'] = resources['agent-config/CLAUDE.md']
+        files[f'{directory}/skills/websmith-site/SKILL.md'] = resources['agent-config/WEBSMITH_SITE_SKILL.md']
+        for name in SKILL_NAMES:
+            canonical = resources[f'skills/{name}/SKILL.md']
+            # Keep trigger metadata in the agent's discovery directory; all
+            # operational content and references live only under skills/.
+            frontmatter = canonical.split('---', 2)[:2]
+            adapter = '---'.join(frontmatter) + '---\n\n'
+            adapter += f'Leggere e applicare [la skill {name}](../../../skills/{name}/SKILL.md). '
+            adapter += 'Individuare la radice del sito e leggere AGENTS.md prima di operare.\n'
+            files[f'{directory}/skills/{name}/SKILL.md'] = adapter
     return files
 
 

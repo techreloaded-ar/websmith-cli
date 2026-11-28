@@ -11,3 +11,7 @@ npm/websmith-*/bin/
 
 # Local account recovery material: never distribute.
 **/*recovery_codes*
+
+# Local mailbox credentials supplied for connection checks.
+/docs/server trtalks@techreloaded.it
+/docs/trtalks@techreloaded.it

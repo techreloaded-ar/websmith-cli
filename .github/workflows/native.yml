@@ -32,7 +32,7 @@ jobs:
       - run: python scripts/build-native.py
       - run: python -m unittest discover -s tests -v
         env:
-          WEBSMITH_RESOURCE_DIR: ${{ github.workspace }}/src/websmith/resources
+          WEBSMITH_RESOURCE_DIR: ${{ github.workspace }}
           WEBSMITH_BROWSER_TEST: ${{ runner.os == 'Linux' && '1' || '' }}
           WEBSMITH_BROWSER_CHANNEL: chrome
           WEBSMITH_TEST_BINARY: ${{ github.workspace }}/dist/native/websmith${{ matrix.target == 'win32-x64' && '.exe' || '' }}

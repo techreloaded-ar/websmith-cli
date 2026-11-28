@@ -26,7 +26,8 @@ class InitTests(unittest.TestCase):
             self.ok(self.cli(root, 'init', '--yes', '--name', 'Caffè & Studio', '--agent', 'codex'))
             self.assertTrue((root / '.agents/skills/websmith-site/SKILL.md').is_file())
             RULES_ROOT = Path(__file__).resolve().parents[1] / 'src/websmith/resources/rules'
-            for name in ('AGENTS.md', 'COMPOSITION_GUIDE.md', 'TONE_OF_VOICE.md', 'EDITORIAL_RULES.md'):
+            self.assertEqual((root / 'AGENTS.md').read_bytes(), (RULES_ROOT.parents[3] / 'agent-config/AGENTS.md').read_bytes())
+            for name in ('COMPOSITION_GUIDE.md', 'TONE_OF_VOICE.md', 'EDITORIAL_RULES.md'):
                 self.assertEqual((root / name).read_bytes(), (RULES_ROOT / name).read_bytes())
             self.assertFalse((root / '.websmith/rules.md').exists())
             (root / 'TONE_OF_VOICE.md').write_text('La voce personalizzata del sito.')

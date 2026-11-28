@@ -50,7 +50,8 @@ class UpdateTests(unittest.TestCase):
             self.assertIn('Nessun file modificato', output)
             self.assertEqual(before, self.snapshot(root))
             self.ok(self.cli(root / 'contents', 'update'))
-            for name in ('AGENTS.md', 'EDITORIAL_RULES.md', 'TONE_OF_VOICE.md'):
+            self.assertEqual((root / 'AGENTS.md').read_bytes(), (Path(__file__).parents[1] / 'agent-config/AGENTS.md').read_bytes())
+            for name in ('EDITORIAL_RULES.md', 'TONE_OF_VOICE.md'):
                 self.assertEqual((root / name).read_bytes(), (RULES_ROOT / name).read_bytes())
             for name, content in before.items():
                 if name.startswith(('contents/', 'templates/')) or name == '.websmith/rules.md':

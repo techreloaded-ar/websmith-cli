@@ -87,9 +87,13 @@ websmith init --yes --name "Il mio sito" --agent codex
 sovrascrive file. Agenti: `codex`, `claude`, `none`. Lingue iniziali: `it`, `en`.
 Le opzioni complete sono in `websmith init --help`.
 
-I modelli Markdown esterni sono copiati nella radice del sito come `AGENTS.md`,
-`COMPOSITION_GUIDE.md`, `TONE_OF_VOICE.md` ed `EDITORIAL_RULES.md`. Le istruzioni
-specifiche Codex/Claude rimandano ad `AGENTS.md`. Websmith non installa o avvia
+La nuova distribuzione contiene `skills/editor/`, `skills/composer/`, `skills/tov/`
+e `skills/mail/`: ciascuna ha un `SKILL.md` e le proprie regole in `references/`.
+I punti di ingresso in `.agents/skills/` o `.claude/skills/` rimandano alle skill;
+`AGENTS.md` coordina i flussi. Le guide omonime nella radice del sito sono copie
+di compatibilità. I file `.local.md` restano nella radice.
+Questa struttura richiede un programma che la supporti; gli eseguibili precedenti
+continuano a installare le guide dai vecchi percorsi. Websmith non installa o avvia
 l'agente, non collega un abbonamento AI e non pubblica il sito.
 
 Le guide esistenti sono preservate. Un sito già inizializzato non viene migrato
@@ -124,11 +128,15 @@ il comando richiede l'installazione della release; non sostituisce un interprete
 Python o un eseguibile Windows in uso.
 
 Dalla versione `0.1.0a9` le istruzioni Markdown sono distribuite separatamente dal
-programma: non sono incluse negli eseguibili. `init` e `update` scaricano i file
-in `src/websmith/resources/` dal ramo `main` di GitHub, fissando tutti i download
-alla stessa revisione. Un push delle regole su `main` basta per renderle disponibili:
-non occorre cambiare versione o ricompilare il programma. Il controllo delle release
-per l'eseguibile resta separato e non lo sostituisce a parità di versione.
+programma: non sono incluse negli eseguibili. `init` e `update` scaricano le
+istruzioni dal ramo `main` di GitHub, fissando tutti i file alla stessa revisione.
+Nel nuovo formato le sorgenti sono in `skills/` e `agent-config/`; la documentazione
+resta in `src/websmith/resources/docs/`. I percorsi precedenti sotto
+`src/websmith/resources/rules/` restano disponibili come copie generate.
+Un push delle regole su `main` le rende disponibili senza ricompilare il programma,
+se il formato è già supportato dall'eseguibile. Il passaggio al formato con skill
+richiede invece una release del programma con il nuovo codice di distribuzione.
+Il controllo delle release resta separato dall'aggiornamento delle istruzioni.
 
 `--dry-run` controlla la release e scarica le istruzioni per mostrare le differenze,
 senza sostituire l'eseguibile né scrivere nel sito o nella cache.
@@ -222,29 +230,53 @@ La pubblicazione remota è un passaggio separato, configurato per il singolo sit
 
 ## Bozze Markdown dalla posta
 
-Quando si chiede all'agente «controlla se c'è posta per me», il controllo riguarda
-solo la casella `trtalks@techreloaded.it` e il `site.id` letto dal `websmith.yaml`
-corrente. Prima della ricerca verificare l'account: non usare la casella personale,
-nemmeno con un filtro sul destinatario. Se la casella autorizzata non è accessibile,
-fermarsi. Nella casella autorizzata filtrare per destinatario `trtalks@techreloaded.it`
-e tag del sito nell'oggetto, verificando entrambi per ogni messaggio.
-Vale anche con Gmail e altri connettori; non estendere la ricerca ad altri account,
-destinatari o siti. La CLI IMAP filtra solo per sito: l'agente può usarla per queste
-richieste solo con l'account autorizzato e una cartella contenente esclusivamente
-messaggi destinati a `trtalks@techreloaded.it`.
+Nella prova corrente il prompt «c’è posta per me?» esegue lo script dalla
+copia di sviluppo di Websmith:
 
 ```bash
-websmith inbox configure --host imap.esempio.it --username bozze@esempio.it
-websmith inbox fetch
-websmith inbox fetch --dry-run
+.venv/bin/python scripts/check-mail.py --all-messages
 ```
 
-`inbox configure` imposta la casella del sito corrente in `.websmith/inbox.json`.
-Senza opzioni chiede i dati nel terminale. Usa IMAP con TLS, porta predefinita 993,
-cartella `INBOX`; sono disponibili `--port`, `--folder` e `--password-env`.
+Legge tutti i messaggi di INBOX di `trtalks@techreloaded.it`, senza filtri `site.id`,
+e restituisce JSON con mittente, oggetto, data e allegati di ogni tipo in
+`attachments`. Le credenziali sono nel file locale `docs/trtalks@techreloaded.it`.
+Non consulta Gmail personale e non modifica le email. `--headers-only` non
+esamina gli allegati. Il filtro per sito è previsto per una fase successiva.
+
+La CLI qui sotto conserva il filtro per sito ed è distinta dalla prova corrente.
+
+Dalla cartella del sito configurare il profilo condiviso:
+
+```bash
+websmith inbox configure --profile shared
+websmith inbox fetch --dry-run
+websmith inbox fetch
+```
+
+Tutti i siti e profili usano la stessa casella; cambia solo il `site.id`.
+`shared` è il profilo comune e `techreloaded` è un alias dello stesso account.
+Le nuove configurazioni usano questi parametri anche senza `--profile`.
+
+Il profilo imposta server `mail.techreloaded.it`, porta TLS 993, username e
+destinatario `trtalks@techreloaded.it`, conservando il `site.id` corrente.
+Il comando filtra sul server per tag del sito e destinatario in To o Cc;
+ricontrolla entrambi nelle intestazioni prima di leggere i corpi e sul messaggio
+completo prima di salvare gli allegati. Il filtro destinatario per questa casella
+vale anche con configurazioni precedenti. Non cercare in altri account o siti.
+
+`inbox configure` salva le impostazioni in `.websmith/inbox.json`.
+Senza opzioni chiede i dati nel terminale. Per altre caselle si possono indicare
+`--host`, `--username`, `--recipient`, `--port`, `--folder` e `--password-env`.
+Il destinatario predefinito delle nuove configurazioni è lo username se è un
+indirizzo email; la cartella predefinita è `INBOX`. I parametri espliciti prevalgono
+sul profilo. Le configurazioni precedenti di altre caselle senza `recipient`
+continuano a filtrare solo per sito.
+
 La password non viene salvata: `fetch` la chiede senza mostrarla oppure legge
-`WEBSMITH_MAIL_PASSWORD` (o la variabile scelta). Alcuni provider richiedono una
-password per applicazioni; OAuth non è incluso.
+`WEBSMITH_MAIL_PASSWORD` (o la variabile scelta). Per l'uso da agente rendere
+la variabile disponibile al processo che esegue il comando; non scrivere la
+password nei file del progetto o negli argomenti del comando. Alcuni provider
+richiedono una password per applicazioni; OAuth non è incluso. SMTP non è usato.
 
 Gli agenti devono inviare allegati `.md`/`.markdown` con un solo tag nell'oggetto:
 `[websmith:IDENTIFICATIVO]`, dove IDENTIFICATIVO è `site.id` in `websmith.yaml`.
@@ -260,7 +292,7 @@ Il download di ciascuna email è atomico. Il server è letto in sola lettura:
 nessuna cancellazione, spostamento o modifica dello stato letto/non letto.
 Le bozze richiedono revisione prima di entrare nei sorgenti del sito.
 
-`fetch --dry-run` controlla solo gli oggetti, senza scaricare allegati o scrivere.
+`fetch --dry-run` controlla solo oggetti e destinatari, senza scaricare allegati o scrivere.
 `--limit` (50) limita messaggi salvati, con errore o elencati in dry-run; i messaggi
 ignorati e già presenti non lo consumano. `--max-message-bytes` (10000000) limita
 la dimensione della singola email e `--timeout` (30) imposta il timeout in secondi.
