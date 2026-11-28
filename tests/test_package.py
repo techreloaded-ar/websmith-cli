@@ -55,7 +55,8 @@ class PackageTests(unittest.TestCase):
         self.assert_ok(self.run_cli('HELP'))
 
     def test_help_overview_and_full_guide(self):
-        resources = Path(engine.__file__).parent / 'resources'
+        # Instructions are distributed separately from the installed package.
+        resources = Path(__file__).resolve().parents[1]
         env = {**os.environ, 'WEBSMITH_RESOURCE_DIR': str(resources)}
         run = lambda *args: subprocess.run(
             [sys.executable, '-m', 'websmith', *args], text=True, capture_output=True, env=env,
