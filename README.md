@@ -5,6 +5,9 @@ computer; configurazione e sorgenti rimangono nella cartella di ciascun sito.
 
 Per una descrizione complessiva del sistema e delle modalità operative, leggere
 [Websmith — Funzionamento e flussi di lavoro](docs/WEBSMITH_FUNZIONAMENTO_E_FLUSSI_DI_LAVORO.md).
+Per lavorare in più persone sullo stesso sito, leggere la
+[guida alla collaborazione](docs/COLLABORAZIONE.md): catalogo condiviso, copia locale,
+ricezione degli aggiornamenti e condivisione tramite richieste in italiano.
 
 ## Organizzazione del progetto
 
@@ -14,6 +17,7 @@ Per una descrizione complessiva del sistema e delle modalità operative, leggere
 | `skills/composer/` | Composizione, traduzioni, validazione e generazione; guida in `references/COMPOSITION_GUIDE.md`. |
 | `skills/tov/` | Definizione e applicazione della voce del sito; parametri in `references/TONE_OF_VOICE.md`. |
 | `skills/mail/` | Controllo della casella condivisa; guida in `references/` e script in `scripts/`. |
+| `skills/collaboration/` | Catalogo dei siti, copie locali, sincronizzazione Git e condivisione guidata. |
 | `agent-config/` | Modelli dei punti di ingresso Codex e Claude. |
 | `src/websmith/` | Codice Python e schemi tecnici; documentazione distribuita in `resources/docs/`. |
 | `scripts/` | Comandi di sviluppo, compilazione e compatibilità. |
@@ -36,9 +40,35 @@ python3 scripts/sync-legacy-instructions.py --check
 ```
 
 Il controllo è eseguito anche in CI. La pubblicazione della sola struttura delle
-skill non aggiorna il codice dei vecchi eseguibili: per installare le quattro
+skill non aggiorna il codice dei vecchi eseguibili: per installare le nuove
 skill nei siti servirà una release del programma che supporti questo formato.
 I vecchi eseguibili continuano a scaricare le guide dai percorsi precedenti.
+
+## Collaborare sullo stesso sito
+
+La skill `collaboration` permette di scegliere un sito da un catalogo condiviso,
+preparare una copia locale, ricevere aggiornamenti e condividere il lavoro.
+Git gestisce le versioni internamente; l'agente presenta richieste e risultati
+in italiano. Sono necessari Git e l'accesso al servizio scelto per questa funzione.
+
+```bash
+websmith collaboration list
+websmith collaboration open miosito.it --destination ./miosito
+websmith collaboration status
+websmith collaboration sync
+websmith collaboration share --message "Aggiornata la pagina contatti"
+```
+
+Configurare prima il catalogo e la propria identità. `status` controlla, `sync`
+riceve e `share` condivide; le modifiche sovrapposte richiedono una scelta guidata
+prima di cambiare i sorgenti o inviare dati. La configurazione dei siti non viene
+trasferita implicitamente ad altri repository e l'eventuale Git usato direttamente
+dal sito mantiene ramo e staging. `websmith update` aggiorna programma e istruzioni;
+`collaboration sync` aggiorna invece il lavoro condiviso.
+
+La [guida per Giovanni e Marta](docs/COLLABORAZIONE.md) descrive preparazione,
+accessi, primo uso e limiti. Nessun comando contatta l'hosting; eventuali
+pubblicazioni attivate dal repository dipendono dalle automazioni del gruppo.
 
 ## Installazione da GitHub (macOS e Linux x64)
 
@@ -51,6 +81,8 @@ curl -fsSL https://raw.githubusercontent.com/techreloaded-ar/websmith-cli/main/s
 Lo script scarica l'eseguibile autonomo della release GitHub corrente, verifica
 il checksum SHA-256 e installa `~/.local/bin/websmith`. Non richiede Python,
 Node.js, npm o Git. Servono Bash, curl, unzip e shasum oppure sha256sum.
+La funzione facoltativa `collaboration` richiede invece Git e l'accesso autorizzato
+ai repository del gruppo; non occorrono per generazione, revisione o controllo posta.
 Su Linux sono supportate le distribuzioni compatibili con Ubuntu 22.04 o successive.
 I target Mac sono Intel e Apple Silicon.
 
@@ -129,7 +161,7 @@ Apri `web/index.html` nel browser. Per cambiare il testo modifica
 Una cartella non vuota senza manifest viene rifiutata: nessuna migrazione implicita.
 Un sito con manifest valido riceve le istruzioni mancanti; istruzioni e guide già
 presenti restano invariate. Le istruzioni sono distribuite da GitHub dalle
-cartelle `skills/` e `agent-config/`: `init` installa le quattro skill in `skills/`
+cartelle `skills/` e `agent-config/`: `init` installa le skill in `skills/`
 e i punti di ingresso nella radice del sito. Copie derivate delle tre guide
 restano nella radice per compatibilità con manifest e agenti precedenti.
 Le regole non sono incorporate nel codice Python.
@@ -149,8 +181,8 @@ l'accesso con ChatGPT avviene nel client Codex; un'integrazione API di Websmith
 non è necessaria né presente. Il browser ChatGPT non riceve automaticamente
 accesso ai file locali. Websmith funziona anche senza agente.
 
-Le sorgenti delle skill sono in `skills/editor/`, `skills/composer/`, `skills/tov/`
-e `skills/mail/`, anche con `--agent none`. I punti di ingresso sono in
+Le sorgenti delle skill sono in `skills/editor/`, `skills/composer/`, `skills/tov/`,
+`skills/mail/` e `skills/collaboration/`, anche con `--agent none`. I punti di ingresso sono in
 `.agents/skills/` per Codex o `.claude/skills/` per Claude: contengono i metadati
 di attivazione e rimandano alle sorgenti, senza duplicarne le procedure.
 Il precedente `websmith-site` resta come ingresso generale di compatibilità.

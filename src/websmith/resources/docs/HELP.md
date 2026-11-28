@@ -87,8 +87,8 @@ websmith init --yes --name "Il mio sito" --agent codex
 sovrascrive file. Agenti: `codex`, `claude`, `none`. Lingue iniziali: `it`, `en`.
 Le opzioni complete sono in `websmith init --help`.
 
-La nuova distribuzione contiene `skills/editor/`, `skills/composer/`, `skills/tov/`
-e `skills/mail/`: ciascuna ha un `SKILL.md` e le proprie regole in `references/`.
+La nuova distribuzione contiene `skills/editor/`, `skills/composer/`, `skills/tov/`,
+`skills/mail/` e `skills/collaboration/`: ciascuna ha un `SKILL.md` e le proprie regole in `references/`.
 I punti di ingresso in `.agents/skills/` o `.claude/skills/` rimandano alle skill;
 `AGENTS.md` coordina i flussi. Le guide omonime nella radice del sito sono copie
 di compatibilità. I file `.local.md` restano nella radice.
@@ -99,6 +99,38 @@ l'agente, non collega un abbonamento AI e non pubblica il sito.
 Le guide esistenti sono preservate. Un sito già inizializzato non viene migrato
 automaticamente: il vecchio `.websmith/rules.md` può restare presente,
 ma nei nuovi siti non viene creato.
+
+## Collaborazione sul sito
+
+Dopo la configurazione iniziale dell'accesso Git e del catalogo, puoi chiedere
+all'agente «Quali siti sono disponibili?», «Voglio lavorare su miosito.it»,
+«Ci sono aggiornamenti degli altri?» oppure «Condividi le mie modifiche».
+La skill `collaboration` guida il lavoro senza richiedere comandi Git all'utente.
+Un solo repository `websmith-sites` contiene `sites.json` e i siti nelle cartelle
+`sites/<identificativo>/`. Ogni copia locale mostra solo il sito scelto e gli
+invii conservano gli altri siti. I permessi del repository comprendono tutti i siti.
+
+```bash
+websmith collaboration configure --repository URL-WEBSMITH-SITES --name "Marta" --email marta@example.test
+websmith collaboration list
+websmith collaboration open miosito.it --destination ./miosito
+```
+
+Dalla cartella del sito: `websmith collaboration status` controlla,
+`websmith collaboration sync` riceve e `websmith collaboration share` condivide.
+`sync` e `share` accettano `--dry-run`: confrontano senza cambiare sorgenti o
+inviare modifiche, aggiornando solo la cache Git interna. Gli aggiornamenti
+compatibili sono combinati; le sovrapposizioni conservano i file e richiedono
+una scelta per le versioni confrontate. La skill spiega confronto e risoluzione.
+
+Il responsabile collega un sito esistente con `collaboration connect` e lo
+aggiunge al catalogo con `collaboration register`. Le opzioni complete sono in
+`websmith collaboration --help` e `websmith collaboration AZIONE --help`.
+Sono necessari Git installato, un repository comune e accessi autorizzati;
+Websmith non crea account o credenziali. Il catalogo non assegna permessi.
+La funzione richiede un programma che la includa. Non esegue operazioni
+sull'hosting; le eventuali automazioni del repository vanno verificate dal gruppo.
+`websmith update` resta distinto dalla sincronizzazione del lavoro sul sito.
 
 ## Aggiornare le istruzioni di un sito esistente
 

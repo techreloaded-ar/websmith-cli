@@ -4,9 +4,10 @@ Questo repository contiene il codice di Websmith. Conservare le modifiche presen
 
 ## Organizzazione delle istruzioni distribuite
 
-Le sorgenti autorevoli sono in `skills/editor/`, `skills/composer/`, `skills/tov/`
-e `skills/mail/`; ogni skill contiene `SKILL.md` e gli eventuali `references/` e
-`scripts/`. I modelli di ingresso per i siti sono in `agent-config/`.
+Le sorgenti autorevoli sono in `skills/editor/`, `skills/composer/`, `skills/tov/`,
+`skills/mail/` e `skills/collaboration/`; ogni skill contiene `SKILL.md` e gli
+eventuali `references/` e `scripts/`. I modelli di ingresso per i siti sono in
+`agent-config/`.
 I file in `src/websmith/resources/rules/` sono copie generate per le installazioni
 precedenti: modificarne le sorgenti e poi eseguire
 `python3 scripts/sync-legacy-instructions.py`. Verificare con `--check`.

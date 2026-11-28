@@ -139,7 +139,7 @@ It should explain where and how to make a change. It must not duplicate exact vi
 ## Agent instruction files
 
 Authoritative instructions live in the repository's `skills/` and `agent-config/`.
-Each of `editor`, `composer`, `tov`, and `mail` owns a `SKILL.md` and its references
+Each of `editor`, `composer`, `tov`, `mail`, and `collaboration` owns a `SKILL.md` and its references
 or scripts. Initialization copies the skill bundles into the site's `skills/`
 and installs thin Codex/Claude discovery entries that refer to them. `AGENTS.md`
 routes work between skills. Existing files are preserved. Instruction text is
@@ -178,6 +178,26 @@ Skill procedures, discovery entries, and agent entry points use hash comparisons
 and proposals when modified locally. Managed guide references use the same
 refresh-and-backup policy as root guide copies. No `.local.md` file is changed.
 `update --dry-run` writes nothing. By default, update checks published GitHub releases (including prereleases).
+The separate `collaboration` commands use Git to share site sources. A single repository, websmith-sites, owns
+the root sites.json catalog and one sites/SITE_ID subtree per site. Catalog entries
+and local state bind each site to exactly that path. Source snapshots strip this
+prefix locally; commits apply it to the isolated index and preserve every sibling
+site and the catalog. Registration changes only sites.json. Repository permissions
+cover all sites; the internal Git cache may contain objects from the whole repo. Each working copy owns a private
+bare repository and a last-synchronized commit in `.websmith/collaboration/`.
+They do not alter an existing user Git index, branch, or staging area. `status`
+compares, `sync` receives, and `share` validates and pushes without force. A
+concurrent remote update rejects the push. Overlaps preserve working files and
+store comparison copies; explicit resolutions bind to the base/local/shared
+content hashes and expire if any changes. Source application backs up original
+bytes and restores files and state after a write failure. Collaboration previews
+may refresh the internal Git cache but do not alter sources or push. Site-local
+rule overrides are team sources; machine state, generated output and private
+paths are excluded. Remote files outside the declared source selection remain
+untouched. Git transport uses system credentials and requires a prepared Git
+installation. No hosting operation is performed, but provider hooks and automation
+are controlled by the site's administrator. These commands require a binary
+release containing their implementation; instruction updates alone cannot add them.
 A native macOS/Linux executable is replaced only by a strictly newer release,
 after SHA-256, startup, and version checks. Equal or newer local versions are
 never overwritten. Git repositories are not pulled or changed. The new binary

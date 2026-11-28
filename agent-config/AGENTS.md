@@ -11,6 +11,7 @@ in `skills/`, leggendo il relativo `SKILL.md` prima di svolgere il lavoro:
 | Modificare pagine, template, componenti, CSS, asset; validare e generare HTML | `skills/composer/SKILL.md` |
 | Definire o modificare voce, pubblico e lessico; applicare il profilo | `skills/tov/SKILL.md` |
 | «C'è posta per me?», controllo messaggi e allegati | `skills/mail/SKILL.md` |
+| Siti del team, copie locali, aggiornamenti dei colleghi e condivisione del lavoro | `skills/collaboration/SKILL.md` |
 
 Combinare le skill necessarie: una revisione con aggiornamento della pagina usa
 editor, tov e composer. Le traduzioni seguono per ora composer. Per scrivere nuovi
@@ -51,3 +52,9 @@ consultare `websmith HELP` o `websmith HELP guida`.
 
 La pubblicazione remota richiede una richiesta dell'utente e il flusso del sito.
 Conservare le modifiche dei collaboratori.
+
+La skill collaboration distingue controllo (`status`), ricezione (`sync`) e
+condivisione dei sorgenti (`share`). Usarla solo se presente e supportata dal
+programma installato; nelle versioni precedenti consultare l'aiuto senza
+improvvisare comandi Git. La condivisione può attivare automazioni del repository
+già configurate dal responsabile: non presumere che siano assenti.

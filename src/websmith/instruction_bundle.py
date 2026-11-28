@@ -1,6 +1,6 @@
 """Inventory of external skills and compatibility paths (no embedded rules)."""
 
-SKILL_NAMES = ('editor', 'composer', 'tov', 'mail')
+SKILL_NAMES = ('editor', 'composer', 'tov', 'mail', 'collaboration')
 GUIDE_SOURCES = {
     'EDITORIAL_RULES.md': 'skills/editor/references/EDITORIAL_RULES.md',
     'COMPOSITION_GUIDE.md': 'skills/composer/references/COMPOSITION_GUIDE.md',
@@ -9,6 +9,7 @@ GUIDE_SOURCES = {
 SKILL_FILES = tuple(f'skills/{name}/SKILL.md' for name in SKILL_NAMES) + tuple(GUIDE_SOURCES.values()) + (
     'skills/mail/references/MAIL_GUIDE.md',
     'skills/mail/scripts/check-mail.py',
+    'skills/collaboration/references/COLLABORATION_GUIDE.md',
 )
 AGENT_FILES = ('agent-config/AGENTS.md', 'agent-config/CLAUDE.md',
                'agent-config/WEBSMITH_SITE_SKILL.md')

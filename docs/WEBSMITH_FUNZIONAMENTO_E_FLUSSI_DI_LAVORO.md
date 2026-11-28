@@ -113,7 +113,7 @@ Prepara un manifest, una homepage Markdown, template, un componente di esempio, 
 | --- | --- |
 | `websmith.yaml` | Lingue, percorsi, template, asset, routing e altre impostazioni operative. |
 | `AGENTS.md` | Coordinamento e scelta delle skill. |
-| `skills/` | Skill editor, composer, tov e mail, con regole e strumenti dedicati. |
+| `skills/` | Skill editor, composer, tov, mail e collaboration, con regole e strumenti dedicati. |
 | `COMPOSITION_GUIDE.md` | Copia di compatibilità della guida nella skill composer. |
 | `TONE_OF_VOICE.md` | Copia di compatibilità dei parametri nella skill tov. |
 | `EDITORIAL_RULES.md` | Copia di compatibilità delle regole nella skill editor. |
@@ -156,7 +156,7 @@ I modelli di `TONE_OF_VOICE.md` ed `EDITORIAL_RULES.md` derivano esclusivamente 
 Le basi sono aggiornate da Websmith; le personalizzazioni appartengono ai file `.local.md` facoltativi del sito. I parametri non compilati non equivalgono a preferenze approvate. I limiti della revisione editoriale riguardano il lavoro su testi già scritti; non trasformano il renderer in un editor.
 
 Le istruzioni autorevoli sono organizzate nel repository in `skills/editor/`,
-`skills/composer/`, `skills/tov/` e `skills/mail/`. Ogni skill contiene `SKILL.md`
+`skills/composer/`, `skills/tov/`, `skills/mail/` e `skills/collaboration/`. Ogni skill contiene `SKILL.md`
 e gli eventuali `references/` e `scripts/`. I modelli di ingresso sono in
 `agent-config/`. Le regole appartengono alla skill responsabile: le altre le
 richiamano senza mantenerne copie manuali.
@@ -386,7 +386,7 @@ allegati. Limiti e codici di uscita sono descritti nel README e nell'help.
 
 Condivisione e pubblicazione hanno scopi diversi. Git può conservare e scambiare sorgenti, guide e modifiche del sito; l'hosting serve invece la versione pubblica.
 
-Lavorare in locale, registrare un commit o inviarlo a un repository non pubblica automaticamente il sito, salvo un'automazione configurata nel progetto specifico. I comandi attuali di Websmith non offrono un catalogo remoto, una sincronizzazione Git guidata o un deployment universale.
+Lavorare in locale, registrare un commit o inviarlo a un repository non pubblica automaticamente il sito, salvo un'automazione configurata nel progetto specifico. La nuova funzione `collaboration` offre un catalogo remoto Git, l’apertura guidata dei siti e la sincronizzazione dei sorgenti; non offre un deployment universale. La [guida alla collaborazione](COLLABORAZIONE.md) descrive il flusso completo.
 
 Le automazioni presenti nel repository `websmith-cli` verificano il pacchetto e costruiscono eseguibili. Non costituiscono un workflow di pubblicazione dei siti. Il precedente processo FTP descritto nella proposta originale apparteneva al progetto di origine e non va considerato una funzione di questa CLI.
 
@@ -403,11 +403,11 @@ Come percorso di collaborazione resta proposto: rami di lavoro, pull request, re
 | Acquisizione di bozze Markdown via posta | `inbox configure` e `inbox fetch`: IMAP TLS, filtri per `site.id` e destinatario, file separati dai sorgenti, deduplicazione per casella e UID. |
 | Tre guide esterne copiate da `init` | Implementate nel codice locale; distribuzione da verificare nella release utilizzata. |
 | Aggiornamento delle istruzioni dei siti già inizializzati | `websmith update` sostituisce le tre basi e conserva i `.local.md`; propone separatamente gli aggiornamenti ai punti di ingresso personalizzati. |
-| Catalogo centrale e download guidato dei siti | Non implementati. |
-| Sincronizzazione Git e gestione guidata dei conflitti | Non implementate come funzioni della CLI. |
+| Catalogo centrale e download guidato dei siti | `collaboration configure`, `list`, `open` e `register`; un solo repository websmith-sites, catalogo nella radice e cartelle sites/IDENTIFICATIVO. |
+| Sincronizzazione Git e gestione guidata dei conflitti | `collaboration connect`, `status`, `sync`, `share`, `resolve`; copie locali protette e confronto delle tre versioni. |
 | Controlli, build completa e deployment automatico dei siti | Da configurare e verificare per il sito pilota. |
 
-Restano da definire il sito e l'hosting del pilota, i permessi di modifica e pubblicazione, la gestione delle versioni Websmith usate in CI, l’integrazione delle proposte nelle guide personalizzate e il recupero da un deployment parziale. L'adozione di un repository separato per ciascun sito e la gestione di un eventuale catalogo restano decisioni progettuali.
+Restano da definire il sito e l'hosting del pilota, i permessi di modifica e pubblicazione, la gestione delle versioni Websmith usate in CI, l’integrazione delle proposte nelle guide personalizzate e il recupero da un deployment parziale. La collaborazione usa un solo repository websmith-sites per il catalogo e tutti i siti. Accesso iniziale e permessi richiedono la configurazione del servizio Git. La funzionalità è disponibile nel codice locale e richiede una release che la includa.
 
 ### Compatibilità dei siti esistenti
 
